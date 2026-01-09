@@ -1,52 +1,94 @@
+
 <!DOCTYPE html>
 <html lang="ml">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Farāid Calculator | ഫറാഇദ് കാൽക്കുലേറ്റർ</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Noto+Sans+Malayalam:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #064e3b;
-      --primary-light: #059669;
-      --accent: #d97706;
-      --bg: #fdfdfb;
+      --primary: #006B46;
+      --secondary: #1E2E4F;
+      --accent: #D89F37;
+      --bg: #F7FAF7;
     }
-    body {
+    
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden !important;
+      position: fixed;
       font-family: 'Plus Jakarta Sans', 'Noto Sans Malayalam', sans-serif;
       background-color: var(--bg);
-      color: #1e293b;
+      color: #0f172a;
       -webkit-tap-highlight-color: transparent;
-      overflow-x: hidden;
+      letter-spacing: -0.01em;
     }
+
+    * {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+    *::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
     .arabic {
       font-family: 'Noto Naskh Arabic', serif;
       direction: rtl;
-      line-height: 1.8;
+      line-height: 1.4;
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: -1.5px;
+      word-spacing: 2px;
       font-feature-settings: "kern", "liga", "clig", "calt";
+      text-rendering: optimizeLegibility;
+      display: inline-block;
+      width: 100%;
+      vertical-align: baseline;
     }
+    
     .malayalam {
       font-family: 'Noto Sans Malayalam', sans-serif;
+      letter-spacing: -0.015em;
     }
+
     .glass {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
-    .islamic-pattern {
-      background-image: radial-gradient(#064e3b 0.5px, transparent 0.5px);
-      background-size: 24px 24px;
-      opacity: 0.03;
+
+    .shadow-soft {
+      shadow-color: rgba(0, 0, 0, 0.05);
+      shadow-offset: {width: 0, height: 4};
+      shadow-opacity: 1;
+      shadow-radius: 20;
     }
+
     @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
+      from { transform: translateY(12px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
+    
     .animate-slide-up {
-      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .bg-soft-gradient {
+      background: linear-gradient(135deg, #ffffff 0%, #f9fdfb 100%);
+    }
+
+    .border-gold {
+      border-color: #D89F37;
     }
   </style>
 <script type="importmap">
@@ -60,7 +102,7 @@
 }
 </script>
 </head>
-<body className="antialiased">
-  <div id="root"></div>
+<body class="antialiased">
+  <div id="root" class="h-full w-full"></div>
 </body>
 </html>

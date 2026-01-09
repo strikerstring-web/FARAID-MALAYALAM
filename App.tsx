@@ -3,6 +3,9 @@ import React, { useState, useMemo } from 'react';
 import { AppStep, Heir, HeirType, CalculationResult, HEIR_METADATA, EstateData } from './types';
 import { calculateShares } from './logic/faraidEngine';
 
+/** 
+ * Screen Wrapper to handle consistent layout across multiple screens 
+ */
 interface ScreenWrapperProps {
   children: React.ReactNode;
   nextStep?: AppStep;
@@ -17,34 +20,29 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   nextStep, 
   prevStep, 
   setStep, 
-  nextLabel = "അടുത്തത്",
-  disabled = false
+  nextLabel = "അടുത്തത്", 
+  disabled = false 
 }) => (
-  <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#fdfdfb]">
-    <div className="absolute inset-0 islamic-pattern pointer-events-none"></div>
-    
-    <main className="flex-1 flex flex-col items-center justify-start max-w-lg mx-auto w-full px-6 py-12 relative z-10 animate-slide-up">
+  <div className="h-full flex flex-col relative overflow-hidden bg-[#F7FAF7]">
+    <main className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full px-5 py-6 relative z-10 overflow-hidden">
       {children}
     </main>
-
-    <div className="sticky bottom-0 left-0 right-0 p-6 glass border-t border-emerald-100/50 flex justify-center gap-4 z-50">
+    <div className="p-4 glass border-t border-slate-100 flex justify-center gap-3 shrink-0">
       {prevStep && (
         <button 
-          onClick={() => setStep(prevStep)}
-          className="flex-1 max-w-[120px] h-14 rounded-2xl font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 active:scale-95 transition-all malayalam flex items-center justify-center gap-2"
+          onClick={() => setStep(prevStep)} 
+          className="flex-1 max-w-[100px] h-12 rounded-xl font-bold text-[#1E2E4F] bg-white border border-slate-200 active:scale-95 transition-all malayalam text-sm"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
           പുറകോട്ട്
         </button>
       )}
       {nextStep && (
         <button 
-          disabled={disabled}
-          onClick={() => setStep(nextStep)}
-          className="flex-1 max-w-xs h-14 bg-emerald-900 hover:bg-emerald-800 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-2xl font-bold text-lg transition-all active:scale-95 shadow-xl shadow-emerald-900/10 malayalam flex items-center justify-center gap-2 group"
+          disabled={disabled} 
+          onClick={() => setStep(nextStep)} 
+          className="flex-1 max-w-xs h-12 bg-[#006B46] text-white rounded-xl font-bold text-base transition-all active:scale-95 shadow-lg shadow-[#006B46]/20 malayalam"
         >
-          <span>{nextLabel}</span>
-          {!disabled && <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>}
+          {nextLabel}
         </button>
       )}
     </div>
@@ -55,12 +53,7 @@ const App: React.FC = () => {
   const [step, setStep] = useState<AppStep>(AppStep.WELCOME);
   const [deceasedGender, setDeceasedGender] = useState<'Male' | 'Female' | null>(null);
   const [heirs, setHeirs] = useState<Heir[]>([]);
-  const [estate, setEstate] = useState<EstateData>({
-    totalAssets: 0,
-    debts: 0,
-    funeral: 0,
-    will: 0
-  });
+  const [estate, setEstate] = useState<EstateData>({ totalAssets: 0, debts: 0, funeral: 0, will: 0 });
   const [result, setResult] = useState<CalculationResult | null>(null);
 
   const heirCategories = useMemo(() => {
@@ -77,14 +70,11 @@ const App: React.FC = () => {
     setHeirs(prev => {
       const existing = prev.find(h => h.type === type);
       if (existing) {
-        let newCount = existing.count + delta;
+        let newCount = Math.max(0, existing.count + delta);
         if (meta.max) newCount = Math.min(newCount, meta.max);
-        newCount = Math.max(0, newCount);
         if (newCount === 0) return prev.filter(h => h.type !== type);
         return prev.map(h => h.type === type ? { ...h, count: newCount } : h);
-      } else if (delta > 0) {
-        return [...prev, { type, count: 1 }];
-      }
+      } else if (delta > 0) return [...prev, { type, count: 1 }];
       return prev;
     });
   };
@@ -93,8 +83,7 @@ const App: React.FC = () => {
 
   const handleCalculate = () => {
     if (deceasedGender) {
-      const calcResult = calculateShares(heirs, deceasedGender, estate);
-      setResult(calcResult);
+      setResult(calculateShares(heirs, deceasedGender, estate));
       setStep(AppStep.RESULT);
     }
   };
@@ -109,23 +98,26 @@ const App: React.FC = () => {
 
   // --- Screens ---
 
+  // Screen 1: Welcome
   if (step === AppStep.WELCOME) {
     return (
-      <div className="min-h-screen bg-emerald-950 flex flex-col items-center justify-center p-8 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 islamic-pattern"></div>
-        <div className="relative z-10 flex flex-col items-center text-center animate-slide-up">
-          <div className="w-32 h-32 bg-emerald-600 rounded-[3rem] flex items-center justify-center mb-10 shadow-3xl shadow-emerald-500/20 rotate-6 hover:rotate-0 transition-transform duration-500">
-            <svg className="w-16 h-16 text-emerald-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="h-full bg-[#1E2E4F] flex flex-col items-center justify-center p-6 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#006B46]/20 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#D89F37]/10 rounded-full -ml-32 -mb-32 blur-3xl"></div>
+        
+        <div className="relative z-10 flex flex-col items-center text-center animate-slide-up w-full max-w-xs">
+          <div className="w-24 h-24 bg-[#006B46] rounded-[2.2rem] flex items-center justify-center mb-10 shadow-2xl shadow-[#000000]/20 border border-white/10">
+            <svg className="w-12 h-12 text-[#D89F37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.247 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 malayalam tracking-tight">ഫറാഇദ് കാൽക്കുലേറ്റർ</h1>
-          <p className="text-emerald-300 max-w-sm mb-16 text-lg malayalam leading-relaxed opacity-80">
-            ഇസ്ലാമിക അവകാശവിഹിതം ലളിതമായി കണക്കാക്കാം
+          <h1 className="text-3xl font-extrabold mb-3 malayalam tracking-tight text-[#F7FAF7]">ഫറാഇദ് കാൽക്കുലേറ്റർ</h1>
+          <p className="text-[#F7FAF7]/60 mb-12 text-base malayalam leading-relaxed px-4 italic">
+            ഇസ്‌ലാമിക അനന്തരാവകാശ നിയമപ്രകാരമുള്ള സ്വത്തുവിഹിതം കൃത്യമായി കണക്കാക്കാം
           </p>
           <button 
-            onClick={() => setStep(AppStep.DESCRIPTION)}
-            className="w-full max-w-xs bg-emerald-500 hover:bg-emerald-400 text-emerald-950 py-5 rounded-2xl font-bold text-xl transition-all active:scale-95 shadow-2xl shadow-emerald-500/30 malayalam"
+            onClick={() => setStep(AppStep.DESCRIPTION)} 
+            className="w-full bg-[#006B46] hover:bg-[#008a5a] text-white py-4 rounded-2xl font-bold text-lg active:scale-95 shadow-xl shadow-black/20 malayalam transition-all"
           >
             തുടരുക
           </button>
@@ -134,203 +126,156 @@ const App: React.FC = () => {
     );
   }
 
+  // Screen 2: Description
   if (step === AppStep.DESCRIPTION) {
     return (
       <ScreenWrapper nextStep={AppStep.HADITH} prevStep={AppStep.WELCOME} setStep={setStep}>
-        <div className="text-center space-y-8">
-          <div className="w-24 h-24 bg-emerald-50 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-100">
-             <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <div className="bg-white rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.04)] p-8 border border-slate-50 w-full flex flex-col gap-6 animate-slide-up bg-soft-gradient">
+          <div className="w-16 h-1 bg-[#D89F37] rounded-full mx-auto opacity-50 mb-2"></div>
+          <h2 className="text-2xl font-bold text-[#1E2E4F] malayalam leading-tight text-center">ഫറാഇദ് നിയമങ്ങൾ</h2>
+          <p className="text-[14px] text-slate-600 leading-relaxed malayalam text-center">
+            ഇസ്‌ലാമിക നിയമപ്രകാരം ഒരാൾ മരണപ്പെട്ടാൽ അയാളുടെ സ്വത്ത് വിഭജിക്കുന്നത് ഖുർആൻ നിശ്ചയിച്ച കൃത്യമായ അവകാശികൾക്കിടയിലാണ്. ഷാഫിഈ മദ്ഹബ് പ്രകാരമുള്ള നിയമങ്ങളാണ് ഈ കാൽക്കുലേറ്ററിൽ ഉപയോഗിച്ചിരിക്കുന്നത്.
+          </p>
+          <div className="bg-[#F7FAF7] p-5 rounded-2xl border border-slate-100">
+            <h4 className="font-bold text-[#006B46] text-sm malayalam mb-2">പ്രത്യേകതകൾ:</h4>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3 text-[12px] text-slate-600 malayalam">
+                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#D89F37] shrink-0"></div>
+                ഷാഫിഈ ഫിഖ്ഹ് അടിസ്ഥാനമാക്കിയുള്ള കണക്കുകൂട്ടൽ.
+              </li>
+              <li className="flex items-start gap-3 text-[12px] text-slate-600 malayalam">
+                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#D89F37] shrink-0"></div>
+                കടങ്ങളും വസീയ്യത്തും കുറച്ച ശേഷമുള്ള കൃത്യമായ വിതരണം.
+              </li>
+            </ul>
           </div>
-          <h3 className="text-2xl font-bold text-emerald-900 malayalam">വിവരണം</h3>
-          <p className="malayalam text-slate-600 leading-relaxed text-xl font-medium px-4">
-            ഖുര്‍ആനും സുന്നത്തും അടിസ്ഥാനമാക്കി മരണപ്പെട്ട വ്യക്തിയുടെ സ്വത്ത് ന്യായമായ വിധത്തിൽ ആരെല്ലാമാണ് ലഭിക്കേണ്ടത് എന്ന് കണക്കാക്കാനുള്ള ഉപകരണം ആണ് ഫറാഇദ് കാൽക്കുലേറ്റർ.
-          </p>
-          <p className="malayalam text-slate-500 leading-relaxed text-base px-6">
-            കേരളത്തിലെ മുസ്ലിം ഉപയോക്താക്കൾക്ക് ലളിതമായ രീതിയിൽ വിവരങ്ങൾ ലഭ്യമാക്കാൻ ഇത് സഹായിക്കുന്നു.
-          </p>
         </div>
       </ScreenWrapper>
     );
   }
 
+  // Screen 3: Hadith Screen
   if (step === AppStep.HADITH) {
     return (
       <ScreenWrapper nextStep={AppStep.AYAH} prevStep={AppStep.DESCRIPTION} setStep={setStep}>
-        <div className="w-full space-y-10">
-          <div className="bg-white p-10 rounded-[3rem] border border-emerald-100 shadow-xl shadow-emerald-900/5 text-center relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-full -mr-16 -mt-16 opacity-50 group-hover:scale-110 transition-transform"></div>
-            <header className="mb-8">
-              <span className="text-[11px] text-emerald-600 font-extrabold tracking-[0.3em] uppercase">Hadith</span>
-              <div className="w-10 h-1 bg-emerald-200 mx-auto mt-2 rounded-full"></div>
-            </header>
-            <p className="arabic text-4xl mb-8 text-emerald-950 font-bold leading-relaxed">"تَعَلَّمُوا الْفَرَائِضَ وَعَلِّمُوهَا النَّاسَ"</p>
-            <p className="malayalam text-emerald-900 leading-relaxed font-bold text-xl">"ഫറാഇദ് (ഇസ്ലാമിക അവകാശവിഭാഗം) പഠിക്കൂ, അത് ആളുകളെ പഠിപ്പിക്കൂ."</p>
+        <div className="bg-white rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.04)] p-8 border border-slate-50 w-full flex flex-col items-center gap-8 animate-slide-up">
+          <div className="flex items-center gap-4 w-full">
+            <div className="h-px flex-1 bg-[#D89F37] opacity-30"></div>
+            <div className="w-2 h-2 rounded-full bg-[#D89F37]"></div>
+            <div className="h-px flex-1 bg-[#D89F37] opacity-30"></div>
           </div>
-          <p className="malayalam text-slate-500 text-center text-lg italic px-4">ഫറാഇദ് പഠിക്കുന്നത് സമൂഹത്തിലെ അവകാശവിതരണത്തിൽ നീതി ഉറപ്പാക്കുന്നു.</p>
+          
+          <div className="arabic text-[26px] text-[#1E2E4F] font-semibold leading-relaxed">
+            أَلْحِقُوا الْفَرَائِضَ بِأَهْلِهَا فَمَا بَقِيَ فَهُوَ لِأَوْلَى رَجُلٍ ذَكَرٍ
+          </div>
+          
+          <div className="h-px w-12 bg-slate-100"></div>
+
+          <p className="text-lg text-[#006B46] font-bold malayalam text-center leading-relaxed">
+            "അവകാശവിഹിതങ്ങൾ അർഹരായവർക്ക് എത്തിക്കുക. ബാക്കി വരുന്നത് ഏറ്റവും അടുത്ത പുരുഷ ബന്ധുവിനുള്ളതാണ്."
+          </p>
+          
+          <span className="px-4 py-1.5 bg-[#F7FAF7] text-[#D89F37] rounded-full text-[10px] font-extrabold uppercase tracking-widest border border-[#D89F37]/20">
+            സ്വഹീഹുൽ ബുഖാരി
+          </span>
         </div>
       </ScreenWrapper>
     );
   }
 
+  // Screen 4: Ayah Screen
   if (step === AppStep.AYAH) {
     return (
-      <ScreenWrapper nextStep={AppStep.RULES} prevStep={AppStep.HADITH} setStep={setStep}>
-        <div className="w-full space-y-10">
-          <div className="bg-white p-10 rounded-[3rem] border border-amber-100 shadow-xl shadow-amber-900/5 text-center relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-32 h-32 bg-amber-50 rounded-br-full -ml-16 -mt-16 opacity-50 group-hover:scale-110 transition-transform"></div>
-            <header className="mb-8">
-              <span className="text-[11px] text-amber-600 font-extrabold tracking-[0.3em] uppercase">Quran 4:11</span>
-              <div className="w-10 h-1 bg-amber-200 mx-auto mt-2 rounded-full"></div>
-            </header>
-            <p className="arabic text-3xl mb-8 text-amber-950 font-bold leading-[2]">"يُوصِيكُمُ اللَّهُ فِي أَوْلَادِكُمْ لِلذَّكَرِ മִثْلُ حَظِّ الْأُنْثَيَيْنِ"</p>
-            <p className="malayalam text-amber-900 leading-relaxed font-bold text-lg">"നിങ്ങളുടെ മക്കളെ സംബന്ധിച്ച് അല്ലാഹു നിങ്ങളെ ഉപദേശിക്കുന്നു; ആൺകുട്ടിക്ക് രണ്ട് പെൺകുട്ടികളുടെ ഓഹരിക്ക് തുല്യമായിരിക്കും."</p>
-          </div>
-          <p className="malayalam text-slate-500 text-center text-lg italic px-4">ഖുര്‍ആനിൽ സുതാര്യമായി അവകാശവിതരണ നിയമങ്ങൾ നിർദ്ദേശിച്ചിട്ടുണ്ട്.</p>
-        </div>
-      </ScreenWrapper>
-    );
-  }
-
-  if (step === AppStep.RULES) {
-    return (
-      <ScreenWrapper nextStep={AppStep.ASSETS} prevStep={AppStep.AYAH} setStep={setStep}>
-        <div className="w-full text-left space-y-6 overflow-y-auto max-h-[70vh] px-2 custom-scrollbar malayalam">
-          <h2 className="text-2xl font-black text-emerald-900 border-b-2 border-emerald-100 pb-2">ഷാഫിഈ ഫിഖ്ഹ് - ഹജ്ബ് (തടയൽ) നിയമങ്ങൾ</h2>
+      <ScreenWrapper nextStep={AppStep.ASSETS} prevStep={AppStep.HADITH} setStep={setStep}>
+        <div className="bg-white rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.04)] p-8 border border-slate-50 w-full flex flex-col items-center gap-8 animate-slide-up bg-soft-gradient">
+           <div className="w-12 h-12 rounded-full bg-[#006B46]/10 flex items-center justify-center text-[#006B46]">
+             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
+           </div>
           
-          <section className="space-y-2">
-            <h3 className="font-bold text-emerald-700 text-lg underline">നിർവ്വചനം</h3>
-            <p className="text-slate-700 leading-relaxed">അർഹനായ ഒരാൾക്ക് മറ്റ് ചില ബന്ധുക്കളുടെ സാന്നിധ്യം കാരണം അവകാശവിഹിതം ലഭിക്കാതിരിക്കുകയോ കുറയുകയോ ചെയ്യുന്നതിനെയാണ് <b>ഹജ്ബ്</b> എന്ന് പറയുന്നത്.</p>
-            <ul className="list-disc ml-5 space-y-1 text-slate-600">
-              <li><b>ഹജ്ബ് ഹിർമാൻ:</b> അവകാശം പൂർണ്ണമായും തടയപ്പെടുന്നത്.</li>
-              <li><b>ഹജ്ബ് നുഖ്സാൻ:</b> ഓഹരിയുടെ അളവ് കുറയുന്നത്.</li>
-            </ul>
-          </section>
+          <div className="arabic text-[22px] text-[#1E2E4F] font-semibold leading-[1.8]">
+            يُوصِيكُمُ اللَّهُ فِي أَوْلَادِكُمْ لِلذَّكَرِ مِثْلُ حَظِّ الْأُنْثَيَيْنِ
+          </div>
 
-          <section className="space-y-2">
-            <h3 className="font-bold text-emerald-700 text-lg underline">പൂർണ്ണമായ തടയൽ (Hijb Hirman)</h3>
-            <p className="text-slate-700">ചിലർ മറ്റുള്ളവരെ പൂർണ്ണമായും ഒഴിവാക്കും:</p>
-            <div className="bg-white p-4 rounded-xl border border-emerald-50 space-y-2 text-sm shadow-sm">
-              <p>• <b>മകൻ:</b> പേരമക്കൾ, സഹോദരങ്ങൾ, പിതൃസഹോദരങ്ങൾ എന്നിവരെ തടയുന്നു.</p>
-              <p>• <b>മകന്റെ മകൻ:</b> താഴോട്ടുള്ള പേരമക്കൾ, സഹോദരങ്ങൾ എന്നിവരെ തടയുന്നു.</p>
-              <p>• <b>പിതാവ്:</b> പിതാമഹനെ (Grandfather) തടയുന്നു.</p>
-              <p>• <b>മാതാവ്:</b> മാതാമഹിയെയും (Grandmother) പിതാമഹിയെയും തടയുന്നു.</p>
-              <p>• <b>സഹോദരൻ (Full):</b> പിതൃസഹോദരങ്ങളെയും അവരുടെ മക്കളെയും തടയുന്നു.</p>
-            </div>
-          </section>
+          <div className="w-full flex justify-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#D89F37]"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#D89F37] opacity-50"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-[#D89F37] opacity-25"></div>
+          </div>
 
-          <section className="space-y-2">
-            <h3 className="font-bold text-emerald-700 text-lg underline">ഒരിക്കലും പൂർണ്ണമായി തടയപ്പെടാത്തവർ</h3>
-            <p className="text-slate-700">താഴെ പറയുന്നവർക്ക് ആര് വന്നാലും ഓഹരി ലഭിക്കും:</p>
-            <div className="flex flex-wrap gap-2">
-              {['പിതാവ്', 'മാതാവ്', 'ഭർത്താവ്', 'ഭാര്യ', 'മകൻ', 'മകൾ'].map(p => (
-                <span key={p} className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-bold">{p}</span>
-              ))}
-            </div>
-          </section>
-
-          <section className="space-y-2">
-            <h3 className="font-bold text-emerald-700 text-lg underline">ഭാഗികമായ തടയൽ (Hijb Nuqsan)</h3>
-            <div className="space-y-3 text-slate-700">
-              <div className="p-3 bg-slate-50 rounded-lg">
-                <p className="font-bold mb-1">മക്കൾ ഉണ്ടെങ്കിൽ:</p>
-                <p className="text-sm">• ഭർത്താവിന്റെ വിഹിതം 1/2-ൽ നിന്ന് 1/4 ആയി കുറയും.</p>
-                <p className="text-sm">• ഭാര്യയുടെ വിഹിതം 1/4-ൽ നിന്ന് 1/8 ആയി കുറയും.</p>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-lg">
-                <p className="font-bold mb-1">രണ്ട് സഹോദരങ്ങൾ ഉണ്ടെങ്കിൽ:</p>
-                <p className="text-sm">• മാതാവിന്റെ വിഹിതം 1/3-ൽ നിന്ന് 1/6 ആയി കുറയും.</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="space-y-2">
-            <h3 className="font-bold text-emerald-700 text-lg underline">ക്രമം (Priority Hierarchy)</h3>
-            <p className="text-xs text-slate-500 mb-2 italic">ഏറ്റവും ശക്തരായ അവകാശികൾ ക്രമത്തിൽ:</p>
-            <ol className="list-decimal ml-5 text-sm space-y-1 text-slate-700">
-              <li>മക്കൾ (പുത്രന്മാർ)</li>
-              <li>മകന്റെ മക്കൾ (താഴോട്ട്)</li>
-              <li>പിതാവ്</li>
-              <li>പിതാമഹൻ</li>
-              <li>സഹോദരങ്ങൾ (Full)</li>
-              <li>പിതൃ സഹോദരന്മാർ</li>
-            </ol>
-          </section>
-
-          <section className="space-y-2 bg-emerald-900 text-emerald-50 p-6 rounded-[2rem]">
-            <h3 className="font-bold text-lg mb-3">ഓർമ്മിക്കാൻ എളുപ്പവഴികൾ</h3>
-            <ul className="space-y-2 text-sm">
-              <li>• “മക്കൾ വന്നാൽ സഹോദരനില്ല”</li>
-              <li>• “അച്ഛൻ വന്നാൽ പിതാമഹനില്ല”</li>
-              <li>• “അമ്മ വന്നാൽ അമ്മമ്മ ഇല്ല”</li>
-              <li>• “കുട്ടികൾ വന്നാൽ ഭർത്താവിനും ഭാര്യക്കും ഓഹരി കുറയും”</li>
-              <li>• “രണ്ട് സഹോദരന്മാർ വന്നാൽ അമ്മയുടെ 1/3 എന്നത് 1/6 ആകും”</li>
-            </ul>
-          </section>
-
-          <p className="text-[11px] text-slate-400 text-center italic mt-4 pb-4">ഷാഫിഈ മദ്ഹബ് പ്രകാരം നീതിപൂർണ്ണമായ വിതരണം ഉറപ്പാക്കാൻ ഈ നിയമങ്ങൾ പാലിക്കേണ്ടതുണ്ട്.</p>
+          <p className="text-base text-[#1E2E4F] font-bold malayalam text-center leading-relaxed px-4">
+            "നിങ്ങളുടെ മക്കളുടെ കാര്യത്തിൽ അല്ലാഹു കൽപ്പിക്കുന്നു; ആണിന് രണ്ട് പെണ്ണിന്റെ വിഹിതത്തിന് തുല്യമായതുണ്ട്."
+          </p>
+          
+          <span className="px-4 py-1.5 bg-[#1E2E4F] text-white rounded-xl text-[10px] font-bold tracking-wider">
+            സൂറത്ത് അന്നിസാഅ് 4:11
+          </span>
         </div>
       </ScreenWrapper>
     );
   }
 
+  // Screen 5: Assets Input
   if (step === AppStep.ASSETS) {
     return (
-      <div className="min-h-screen bg-[#fdfdfb] flex flex-col p-6 animate-slide-up pb-28 islamic-pattern">
-        <header className="mb-10 mt-8 text-center max-w-md mx-auto">
-          <h2 className="text-3xl font-black text-emerald-950 mb-3 malayalam">സ്വത്ത് വിവരങ്ങൾ</h2>
-          <p className="text-slate-500 text-sm malayalam leading-relaxed">ലഭ്യമായ ആസ്തിയും ബാധ്യതകളും ഇവിടെ നൽകുക.</p>
+      <div className="h-full bg-[#F7FAF7] flex flex-col p-5 animate-slide-up overflow-hidden">
+        <header className="mb-6 mt-4 text-center shrink-0">
+          <h2 className="text-xl font-black text-[#1E2E4F] mb-1 malayalam">സ്വത്ത് വിവരങ്ങൾ</h2>
+          <p className="text-slate-400 text-[12px] malayalam">കൈമാറുന്നതിന് മുൻപുള്ള വിവരങ്ങൾ നൽകുക</p>
         </header>
 
-        <div className="space-y-4 max-w-md mx-auto w-full">
+        <div className="space-y-3 max-w-sm mx-auto w-full flex-1 overflow-y-auto pr-1">
           {[
-            { label: 'ആസ്തി (മൊത്തം സ്വത്ത്):', key: 'totalAssets' },
-            { label: 'കടം (കരുതേണ്ട കുടിശ്ശിക):', key: 'debts' },
-            { label: 'പരിച്ഛേദ ചെലവ് (Funeral ചെലവ്):', key: 'funeral' },
-            { label: 'വസീയ്യത്ത് (Will):', key: 'will' }
+            { label: 'ആസ്തി (മൊത്തം സ്വത്ത്):', key: 'totalAssets', color: 'bg-emerald-50 text-emerald-900 border-emerald-100' },
+            { label: 'കടം (ബാധ്യതകൾ):', key: 'debts', color: 'bg-rose-50 text-rose-900 border-rose-100' },
+            { label: 'മരണാനന്തര കർമ്മങ്ങൾ:', key: 'funeral', color: 'bg-slate-50 text-slate-900 border-slate-100' },
+            { label: 'വസീയ്യത്ത് (പരമാവധി 1/3):', key: 'will', color: 'bg-amber-50 text-amber-900 border-amber-100' }
           ].map(field => (
-            <div key={field.key} className="bg-white p-5 rounded-3xl border border-emerald-100/50 shadow-sm space-y-3">
-              <label className="text-sm font-bold text-emerald-900 malayalam">{field.label}</label>
+            <div key={field.key} className={`p-4 rounded-[1.5rem] border shadow-sm space-y-2 ${field.color}`}>
+              <label className="text-[11px] font-bold malayalam uppercase tracking-wide opacity-80">{field.label}</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-300 font-bold text-xl">₹</span>
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-lg opacity-30">₹</span>
                 <input 
                   type="number" 
-                  value={(estate as any)[field.key] || ''}
-                  onChange={e => setEstate({...estate, [field.key]: Math.max(0, Number(e.target.value))})}
-                  className="w-full bg-emerald-50/30 border-2 border-transparent focus:border-emerald-500 focus:bg-white rounded-2xl py-4 pl-12 pr-4 outline-none transition-all font-bold text-xl text-emerald-950 placeholder-emerald-200"
-                  placeholder="0"
+                  value={(estate as any)[field.key] || ''} 
+                  onChange={e => setEstate({...estate, [field.key]: Math.max(0, Number(e.target.value))})} 
+                  className="w-full bg-white/50 border-none rounded-xl py-2.5 pl-10 pr-4 outline-none font-bold text-lg" 
+                  placeholder="0" 
                 />
               </div>
             </div>
           ))}
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 p-6 glass border-t border-emerald-100 flex justify-center gap-4 z-50">
-          <button onClick={() => setStep(AppStep.RULES)} className="flex-1 max-w-[120px] h-14 border-2 border-emerald-100 bg-emerald-50/50 text-emerald-800 rounded-2xl font-bold active:scale-95 malayalam">പുറകോട്ട്</button>
-          <button onClick={() => setStep(AppStep.GENDER)} className="flex-1 max-w-xs h-14 bg-emerald-900 text-white rounded-2xl font-bold text-lg shadow-xl shadow-emerald-900/10 malayalam">അടുത്തത്</button>
+        <div className="p-4 glass border-t border-slate-100 flex justify-center gap-3 shrink-0 mt-4">
+          <button onClick={() => setStep(AppStep.AYAH)} className="flex-1 max-w-[90px] h-12 border border-slate-200 bg-white text-slate-500 rounded-xl font-bold active:scale-95 malayalam text-sm">പുറകോട്ട്</button>
+          <button onClick={() => setStep(AppStep.GENDER)} className="flex-1 max-w-xs h-12 bg-[#006B46] text-white rounded-xl font-bold text-base shadow-xl malayalam">അടുത്തത്</button>
         </div>
       </div>
     );
   }
 
+  // Screen 6: Gender Selection
   if (step === AppStep.GENDER) {
     return (
       <ScreenWrapper nextStep={deceasedGender ? AppStep.SELECTION : undefined} prevStep={AppStep.ASSETS} setStep={setStep} disabled={!deceasedGender}>
-        <div className="text-center space-y-12 w-full">
-          <header>
-            <h2 className="text-3xl font-black text-emerald-950 malayalam mb-2">മരണപ്പെട്ട വ്യക്തി ആരാണ്?</h2>
-          </header>
+        <div className="text-center space-y-10 w-full flex flex-col justify-center h-full">
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black text-[#1E2E4F] malayalam">മരണപ്പെട്ട വ്യക്തി</h2>
+            <p className="text-slate-400 text-sm malayalam">ആരുടെ സ്വത്താണ് വിഭജിക്കേണ്ടത്?</p>
+          </div>
           
-          <div className="grid grid-cols-1 gap-5 w-full">
+          <div className="grid grid-cols-1 gap-4 w-full">
             {[
-              { id: 'Male', label: 'പുരുഷൻ' },
-              { id: 'Female', label: 'സ്ത്രീ' }
+              { id: 'Male', label: 'പുരുഷൻ', sub: 'Male' },
+              { id: 'Female', label: 'സ്ത്രീ', sub: 'Female' }
             ].map((opt) => (
               <button 
-                key={opt.id}
-                onClick={() => setDeceasedGender(opt.id as any)}
-                className={`w-full py-10 rounded-[2.5rem] font-black text-2xl transition-all malayalam border-4 ${deceasedGender === opt.id ? 'bg-emerald-900 border-emerald-500 text-white shadow-2xl' : 'bg-white border-emerald-50 text-emerald-800 hover:border-emerald-200'}`}
+                key={opt.id} 
+                onClick={() => setDeceasedGender(opt.id as any)} 
+                className={`w-full py-8 rounded-[2rem] font-bold transition-all malayalam border-2 flex flex-col items-center gap-1 ${deceasedGender === opt.id ? 'bg-[#1E2E4F] border-[#1E2E4F] text-white shadow-2xl' : 'bg-white border-slate-100 text-slate-600'}`}
               >
-                {opt.label}
+                <span className="text-xl">{opt.label}</span>
+                <span className={`text-[10px] font-bold uppercase tracking-widest opacity-40`}>{opt.sub}</span>
               </button>
             ))}
           </div>
@@ -339,58 +284,47 @@ const App: React.FC = () => {
     );
   }
 
+  // Screen 7: Relatives Selection
   if (step === AppStep.SELECTION) {
     return (
-      <div className="min-h-screen bg-[#fdfdfb] flex flex-col p-6 pb-32 animate-slide-up islamic-pattern">
-        <header className="mb-6 mt-4 text-center max-w-md mx-auto">
-          <h2 className="text-2xl font-black text-emerald-950 mb-1 malayalam">ബന്ധുക്കളെ തിരഞ്ഞെടുക്കുക</h2>
-          <p className="text-slate-500 text-sm malayalam leading-relaxed">അർഹരായ ഓരോ ബന്ധുക്കളെയും തിരഞ്ഞെടുക്കുക.</p>
+      <div className="h-full bg-[#F7FAF7] flex flex-col p-5 animate-slide-up overflow-hidden">
+        <header className="mb-4 mt-4 text-center shrink-0">
+          <h2 className="text-xl font-black text-[#1E2E4F] mb-1 malayalam">ബന്ധുക്കൾ</h2>
+          <p className="text-slate-400 text-[11px] malayalam">നിലവിലുള്ള ഓരോ അവകാശികളെയും ചേർക്കുക</p>
         </header>
 
-        <div className="space-y-6 max-w-md mx-auto w-full overflow-y-auto pb-4 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto pb-4 space-y-5 max-w-sm mx-auto w-full pr-1">
           {(Object.entries(heirCategories) as [string, HeirType[]][]).map(([category, types]) => {
-            const filteredTypes = types.filter(t => {
-              if (t === 'Husband' && deceasedGender === 'Male') return false;
-              if (t === 'Wife' && deceasedGender === 'Female') return false;
-              return true;
-            });
-            if (filteredTypes.length === 0) return null;
-
+            const filtered = types.filter(t => (t === 'Husband' ? deceasedGender === 'Female' : t === 'Wife' ? deceasedGender === 'Male' : true));
+            if (filtered.length === 0) return null;
             return (
               <div key={category} className="space-y-3">
-                <div className="flex items-center gap-3 px-2">
-                  <div className="h-px flex-1 bg-emerald-100"></div>
-                  <h4 className="text-[10px] font-extrabold text-emerald-700/60 uppercase tracking-[0.3em] malayalam whitespace-nowrap">{category}</h4>
-                  <div className="h-px flex-1 bg-emerald-100"></div>
+                <div className="flex items-center gap-3 px-1">
+                   <h4 className="text-[10px] font-bold text-[#D89F37] uppercase tracking-widest malayalam whitespace-nowrap">{category}</h4>
+                   <div className="h-px w-full bg-[#D89F37] opacity-20"></div>
                 </div>
-                <div className="grid grid-cols-1 gap-3">
-                  {filteredTypes.map(type => {
+                <div className="grid grid-cols-1 gap-2.5">
+                  {filtered.map(type => {
                     const count = getHeirCount(type);
                     const meta = HEIR_METADATA[type];
                     return (
-                      <div 
-                        key={type} 
-                        className={`p-4 rounded-2xl border transition-all duration-300 flex items-center justify-between ${count > 0 ? 'bg-emerald-900 border-emerald-700 shadow-md ring-2 ring-emerald-900/10' : 'bg-white border-emerald-50 shadow-sm'}`}
-                      >
-                        <div className="flex flex-col flex-1 pr-4">
-                          <span className={`font-bold malayalam leading-snug text-base ${count > 0 ? 'text-white' : 'text-emerald-950'}`}>
-                            {meta.ml}
-                          </span>
+                      <div key={type} className={`p-4 rounded-[1.5rem] border flex items-center justify-between transition-all duration-300 ${count > 0 ? 'bg-[#006B46] border-[#006B46] text-white shadow-md' : 'bg-white border-slate-100 shadow-sm'}`}>
+                        <div className="flex flex-col">
+                          <span className="font-bold malayalam text-[14px] leading-tight">{meta.ml}</span>
+                          <span className={`text-[9px] font-bold uppercase tracking-wider ${count > 0 ? 'opacity-50' : 'text-slate-300'}`}>{type}</span>
                         </div>
-                        <div className={`flex items-center gap-2 p-1 rounded-xl shrink-0 ${count > 0 ? 'bg-emerald-800' : 'bg-emerald-50'}`}>
+                        <div className={`flex items-center gap-2 p-1 rounded-xl ${count > 0 ? 'bg-black/10' : 'bg-slate-50'}`}>
                           <button 
-                            onClick={() => updateHeirCount(type, -1)}
-                            className={`w-9 h-9 rounded-lg shadow-sm flex items-center justify-center transition-all active:scale-90 ${count > 0 ? 'bg-emerald-700 text-white' : 'bg-white text-emerald-400'}`}
+                            onClick={() => updateHeirCount(type, -1)} 
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${count > 0 ? 'bg-white/20 text-white' : 'bg-white text-slate-300 border border-slate-100'}`}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" /></svg>
                           </button>
-                          <span className={`w-6 text-center font-black text-lg ${count > 0 ? 'text-white' : 'text-emerald-950'}`}>
-                            {count}
-                          </span>
+                          <span className="w-5 text-center font-bold text-[14px]">{count}</span>
                           <button 
-                            disabled={meta.max ? count >= meta.max : false}
-                            onClick={() => updateHeirCount(type, 1)}
-                            className={`w-9 h-9 rounded-lg shadow-sm flex items-center justify-center transition-all active:scale-90 disabled:opacity-30 ${count > 0 ? 'bg-emerald-700 text-white' : 'bg-white text-emerald-800'}`}
+                            disabled={meta.max ? count >= meta.max : false} 
+                            onClick={() => updateHeirCount(type, 1)} 
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${count > 0 ? 'bg-white/20 text-white' : 'bg-white text-[#006B46] border border-slate-100'}`}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
                           </button>
@@ -404,64 +338,65 @@ const App: React.FC = () => {
           })}
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 p-6 glass border-t border-emerald-100 flex justify-center gap-4 z-50">
-          <button onClick={() => setStep(AppStep.GENDER)} className="flex-1 max-w-[110px] h-14 border-2 border-emerald-100 bg-emerald-50/50 text-emerald-800 rounded-2xl font-bold active:scale-95 malayalam">പുറകോട്ട്</button>
-          <button 
-            disabled={heirs.length === 0}
-            onClick={handleCalculate} 
-            className="flex-1 max-w-xs h-14 bg-emerald-900 text-white rounded-2xl font-black text-lg shadow-xl shadow-emerald-900/20 malayalam flex items-center justify-center gap-2"
-          >
-            <span>കണക്കാക്കുക</span>
-          </button>
+        <div className="p-4 glass border-t border-slate-100 flex justify-center gap-3 shrink-0 mt-4">
+          <button onClick={() => setStep(AppStep.GENDER)} className="flex-1 max-w-[90px] h-12 border border-slate-200 bg-white text-slate-500 rounded-xl font-bold active:scale-95 malayalam text-sm">പുറകോട്ട്</button>
+          <button disabled={heirs.length === 0} onClick={handleCalculate} className="flex-1 max-w-xs h-12 bg-[#006B46] text-white rounded-xl font-black text-base shadow-xl malayalam">കണക്കാക്കുക</button>
         </div>
       </div>
     );
   }
 
+  // Screen 8: Results
   if (step === AppStep.RESULT && result) {
     return (
-      <div className="min-h-screen bg-[#fdfdfb] flex flex-col p-6 py-14 animate-slide-up islamic-pattern">
-        <header className="mb-12 text-center space-y-5 max-w-md mx-auto">
-          <h2 className="text-3xl font-black text-emerald-950 malayalam">അവകാശ വിഹിതങ്ങൾ</h2>
-          <div className="bg-emerald-900 text-white px-10 py-6 rounded-[2.5rem] inline-block shadow-2xl relative overflow-hidden">
-             <p className="text-[10px] uppercase font-black tracking-[0.3em] mb-2 opacity-60">Net Estate</p>
-             <p className="text-3xl font-black">₹{result.netEstate.toLocaleString()}</p>
+      <div className="h-full bg-[#F7FAF7] flex flex-col p-5 py-6 animate-slide-up overflow-hidden">
+        <header className="mb-8 text-center shrink-0">
+          <h2 className="text-2xl font-black text-[#1E2E4F] malayalam">അവകാശ വിഹിതങ്ങൾ</h2>
+          <div className="bg-[#1E2E4F] text-white px-10 py-5 rounded-[2.2rem] inline-block mt-4 shadow-xl border border-white/10">
+             <p className="text-[10px] uppercase font-bold tracking-[0.2em] mb-1 opacity-50">വിതരണത്തിനുള്ള തുക</p>
+             <p className="text-2xl font-black text-[#D89F37]">₹{result.netEstate.toLocaleString()}</p>
           </div>
         </header>
 
-        <div className="max-w-xl mx-auto w-full space-y-8 flex-1">
-          {result.warnings.map((w, i) => (
-            <div key={i} className="bg-rose-50 text-rose-800 p-6 rounded-[2.5rem] border border-rose-100 text-sm font-bold flex gap-4 items-start shadow-sm">
-              <span className="malayalam leading-relaxed">{w}</span>
-            </div>
-          ))}
-
-          {result.complex && (
-            <div className="bg-amber-50 text-amber-900 p-8 rounded-[3rem] border-2 border-amber-100 text-center shadow-xl malayalam space-y-2">
-              <p className="font-black text-xl">സങ്കീർണ്ണമായ കേസ്</p>
-              <p className="text-sm opacity-80 leading-relaxed">കൃത്യതയ്ക്കായി ഒരു പണ്ഡിതനെ സമീപിക്കാൻ താൽപ്പര്യപ്പെടുന്നു.</p>
-            </div>
-          )}
-
-          <div className="bg-white p-4 rounded-[3.5rem] shadow-2xl border border-emerald-50 overflow-hidden divide-y divide-emerald-50/50">
-            {result.shares.map((share, i) => (
-              <div key={i} className="group flex items-center justify-between p-7 transition-all hover:bg-emerald-50/30">
-                <div className="space-y-2">
-                  <p className="font-black text-emerald-950 text-2xl malayalam leading-tight">{share.label}</p>
-                  <p className="text-[10px] text-emerald-800/40 font-extrabold uppercase tracking-widest">{share.percentage}</p>
-                </div>
-                <div className="text-right flex flex-col items-end gap-1">
-                  <div className="bg-emerald-50 text-emerald-900 px-6 py-2.5 rounded-2xl font-black text-xl">{share.fraction}</div>
-                  {share.amount !== undefined && <p className="text-xs font-bold text-emerald-800/30">₹{share.amount.toLocaleString()}</p>}
-                </div>
+        <div className="max-w-md mx-auto w-full flex-1 flex flex-col min-h-0">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+            {result.warnings.map((w, i) => (
+              <div key={i} className="bg-rose-50 text-rose-800 p-4 rounded-2xl border border-rose-100 text-[12px] font-bold flex gap-3 malayalam shrink-0 shadow-sm">
+                <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                {w}
               </div>
             ))}
+            
+            <div className="space-y-3">
+              {result.shares.map((share, i) => (
+                <div key={i} className="bg-white rounded-[1.8rem] shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-50 flex items-center justify-between p-5 group transition-all hover:bg-emerald-50/20">
+                  <div className="space-y-1">
+                    <p className="font-bold text-[#1E2E4F] text-[16px] malayalam leading-tight">{share.label}</p>
+                    <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase">{share.percentage}</p>
+                  </div>
+                  <div className="text-right flex flex-col items-end gap-1.5">
+                    <div className="bg-[#F7FAF7] text-[#006B46] px-4 py-1.5 rounded-xl font-black text-[15px] border border-emerald-50">{share.fraction}</div>
+                    {share.amount !== undefined && <p className="text-[11px] font-bold text-[#D89F37]">₹{share.amount.toLocaleString()}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 mt-16 max-w-md mx-auto w-full mb-12">
-          <button onClick={() => setStep(AppStep.SELECTION)} className="w-full bg-emerald-950 text-white h-16 rounded-2xl font-black text-lg transition-all active:scale-95 shadow-2xl malayalam flex items-center justify-center gap-2">വിവരങ്ങൾ മാറ്റുക</button>
-          <button onClick={reset} className="w-full border-2 border-emerald-100 bg-white text-emerald-800 h-16 rounded-2xl font-black text-lg transition-all active:scale-95 malayalam">പുതിയ കണക്ക് തുടങ്ങുക</button>
+        <div className="flex flex-col gap-3 mt-8 max-w-sm mx-auto w-full shrink-0">
+          <button 
+            onClick={() => setStep(AppStep.SELECTION)} 
+            className="w-full bg-[#1E2E4F] text-white h-14 rounded-2xl font-bold text-base malayalam py-3 shadow-lg active:scale-95 transition-transform"
+          >
+            മാറ്റങ്ങൾ വരുത്തുക
+          </button>
+          <button 
+            onClick={reset} 
+            className="w-full text-slate-400 font-bold text-[13px] malayalam py-2 hover:text-[#006B46] transition-colors"
+          >
+            പുതിയ കണക്ക് തുടങ്ങുക
+          </button>
         </div>
       </div>
     );
