@@ -1,0 +1,8 @@
+{
+  "name": "Faraid Malayalam - Islamic Inheritance Assistant",
+  "description": "A specialized tool for managing and preparing Islamic inheritance data based on Shafi'i Fiqh, featuring Malayalam support and an elegant Islamic-inspired UI.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
