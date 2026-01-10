@@ -3,18 +3,18 @@
 <html lang="ml">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Farāid Calculator | ഫറാഇദ് കാൽക്കുലേറ്റർ</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #006B46;
       --secondary: #1E2E4F;
       --accent: #D89F37;
-      --bg: #F7FAF7;
+      --bg: #F0F4F0;
     }
     
     html, body {
@@ -28,67 +28,114 @@
       background-color: var(--bg);
       color: #0f172a;
       -webkit-tap-highlight-color: transparent;
-      letter-spacing: -0.01em;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
     }
 
-    * {
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0l20 20-20 20-20-20zM0 40l20 20-20 20-20-20zM80 40l20 20-20 20-20-20zM40 80l20 20-20 20-20-20z' fill='%23006b46' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hide-scrollbar {
       scrollbar-width: none !important;
       -ms-overflow-style: none !important;
     }
-    *::-webkit-scrollbar {
+    .hide-scrollbar::-webkit-scrollbar {
       display: none !important;
-      width: 0 !important;
-      height: 0 !important;
     }
 
+    /* Rule-compliant Arabic Styling */
     .arabic {
-      font-family: 'Noto Naskh Arabic', serif;
-      direction: rtl;
-      line-height: 1.4;
-      font-weight: 600;
-      text-align: center;
-      letter-spacing: -1.5px;
-      word-spacing: 2px;
-      font-feature-settings: "kern", "liga", "clig", "calt";
-      text-rendering: optimizeLegibility;
-      display: inline-block;
-      width: 100%;
-      vertical-align: baseline;
+      font-family: 'Noto Naskh Arabic', 'Amiri', serif;
+      direction: rtl !important;
+      text-align: center !important;
+      font-size: 28px !important;
+      line-height: 1.6 !important;
+      font-weight: 600 !important;
+      letter-spacing: 0px !important;
+      unicode-bidi: isolate;
     }
     
     .malayalam {
       font-family: 'Noto Sans Malayalam', sans-serif;
       letter-spacing: -0.015em;
+      line-height: 1.55;
+      font-feature-settings: "kern", "liga", "palt", "vhal";
+    }
+
+    .malayalam-translation {
+      direction: ltr !important;
+      text-align: center !important;
+      font-size: 16px !important;
+      line-height: 1.5 !important;
+    }
+
+    .word-ready-text {
+      text-align: justify;
+      text-justify: inter-word;
     }
 
     .glass {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      border-top: 1px solid rgba(255, 255, 255, 0.5);
     }
 
-    .shadow-soft {
-      shadow-color: rgba(0, 0, 0, 0.05);
-      shadow-offset: {width: 0, height: 4};
-      shadow-opacity: 1;
-      shadow-radius: 20;
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 24px;
+      box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.08);
     }
 
-    @keyframes slideUp {
+    .glass-navy {
+      background: rgba(30, 46, 79, 0.85);
+      backdrop-filter: blur(20px) saturate(150%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .ref-chip {
+      background: linear-gradient(135deg, #006B46, #1E2E4F);
+      font-size: 12px;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    @keyframes slideIn {
       from { transform: translateY(12px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
     
-    .animate-slide-up {
-      animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    .animate-in {
+      animation: slideIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
 
-    .bg-soft-gradient {
-      background: linear-gradient(135deg, #ffffff 0%, #f9fdfb 100%);
+    .active-press:active {
+      transform: scale(0.97);
+      transition: transform 0.1s ease;
     }
 
-    .border-gold {
-      border-color: #D89F37;
+    .scroll-container {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
   </style>
 <script type="importmap">
@@ -103,6 +150,6 @@
 </script>
 </head>
 <body class="antialiased">
-  <div id="root" class="h-full w-full"></div>
+  <div id="root" class="h-full w-full relative z-10 overflow-hidden"></div>
 </body>
 </html>

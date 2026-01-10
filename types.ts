@@ -12,33 +12,41 @@ export enum AppStep {
 }
 
 export const HEIR_METADATA: Record<string, { ml: string, category: string, max?: number }> = {
-  'Husband': { ml: 'ഭർത്താവ്', category: 'പ്രാഥമിക കുടുംബം', max: 1 },
-  'Wife': { ml: 'ഭാര്യമാർ', category: 'പ്രാഥമിക കുടുംബം', max: 4 },
-  'Son': { ml: 'പുത്രന്മാർ', category: 'പ്രാഥമിക കുടുംബം' },
-  'Daughter': { ml: 'പുത്രിമാർ', category: 'പ്രാഥമിക കുടുംബം' },
-  'Father': { ml: 'പിതാവ്', category: 'മാതാപിതാക്കൾ', max: 1 },
-  'Mother': { ml: 'മാതാവ്', category: 'മാതാപിതാക്കൾ', max: 1 },
-  'Paternal Grandfather': { ml: 'പിതാമഹൻ (പിതാവിന്റെ പിതാവ്)', category: 'മാതാപിതാക്കൾ', max: 1 },
-  'Paternal Grandmother': { ml: 'പിതാമഹി (പിതാവിന്റെ മാതാവ്)', category: 'മാതാപിതാക്കൾ', max: 1 },
-  'Maternal Grandmother': { ml: 'മാതാമഹി (മാതാവിന്റെ മാതാവ്)', category: 'മാതാപിതാക്കൾ', max: 1 },
-  'Full Brother': { ml: 'സഹോദരന്മാർ (Full)', category: 'സഹോദരങ്ങൾ' },
-  'Full Sister': { ml: 'സഹോദരിമാർ (Full)', category: 'സഹോദരങ്ങൾ' },
-  'Paternal Brother': { ml: 'പിതൃ സഹോദരന്മാർ', category: 'സഹോദരങ്ങൾ' },
-  'Paternal Sister': { ml: 'പിതൃ സഹോദരിമാർ', category: 'സഹോദരങ്ങൾ' },
-  'Maternal Brother': { ml: 'മാതൃ സഹോദരന്മാർ', category: 'സഹോദരങ്ങൾ' },
-  'Maternal Sister': { ml: 'മാതൃ സഹോദരിമാർ', category: 'സഹോദരങ്ങൾ' },
-  'Full Paternal Uncle': { ml: 'പിതൃച്ഛന്മാർ (Full Paternal Uncles)', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Paternal Paternal Uncle': { ml: 'പിതൃ പിതൃച്ഛന്മാർ', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Full Nephew': { ml: 'അനുജന്മാർ (Brother’s sons)', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Paternal Nephew': { ml: 'പിതൃ അനുജന്മാർ', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Full Nephew Son': { ml: 'അനുജപുത്രന്മാർ', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Paternal Nephew Son': { ml: 'പിതൃ അനുജപുത്രന്മാർ', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Full Cousin': { ml: 'കുസിന്‍സ് (Full Cousins)', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Paternal Cousin': { ml: 'പിതൃ കുസിന്‍സ്', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Full Cousin Son': { ml: 'കുസിന്‍സ് പുത്രന്മാർ', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Paternal Cousin Son': { ml: 'പിതൃ കുസിന്‍സ് പുത്രന്മാർ', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Full Cousin Grandson': { ml: 'കുസിന്‍സ് പുത്രപുത്രന്മാർ', category: 'മറ്റു ബന്ധുക്കൾ' },
-  'Paternal Cousin Grandson': { ml: 'പിതൃ കുസിന്‍സ് പുത്രപുത്രന്മാർ', category: 'മറ്റു ബന്ധുക്കൾ' }
+  // A) നിശ്ചിത വിഹിതക്കാർ (Qur’anic Sharers – 12)
+  'Husband': { ml: 'ഭർത്താവ്', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)', max: 1 },
+  'Wife': { ml: 'ഭാര്യ', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)', max: 4 },
+  'Father': { ml: 'പിതാവ്', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)', max: 1 },
+  'Mother': { ml: 'മാതാവ്', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)', max: 1 },
+  'Paternal Grandfather': { ml: 'പിതാമഹൻ', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)', max: 1 },
+  'Paternal Grandmother': { ml: 'പിതാമാഹി', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)', max: 1 },
+  'Maternal Grandmother': { ml: 'മാതാമാഹി', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)', max: 1 },
+  'Daughter': { ml: 'മകൾ', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)' },
+  'Son’s Daughter': { ml: 'പുത്രന്റെ മകൾ (പൗത്രി)', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)' },
+  'Full Sister': { ml: 'പൂർണ്ണ സഹോദരി', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)' },
+  'Paternal Sister': { ml: 'പിതൃ സഹോദരി', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)' },
+  'Maternal Sister': { ml: 'മാതൃ സഹോദരി', category: 'നിശ്ചിത വിഹിതക്കാർ (Sharers)' },
+
+  // B) അസാബ (Residuaries – 16)
+  'Son': { ml: 'പുത്രൻ', category: 'അസാബ (Residuaries)' },
+  'Son’s Son': { ml: 'പുത്രന്റെ പുത്രൻ', category: 'അസാബ (Residuaries)' },
+  'Sons further down': { ml: 'പുത്രന്റെ പുത്രൻ്റെ പുത്രൻ (താഴേക്ക്)', category: 'അസാബ (Residuaries)' },
+  'Full Brother': { ml: 'പൂർണ്ണ സഹോദരൻ', category: 'അസാബ (Residuaries)' },
+  'Full Brother’s Son': { ml: 'പൂർണ്ണ സഹോദരൻ്റെ പുത്രൻ', category: 'അസാബ (Residuaries)' },
+  'Full Brother’s Sons further down': { ml: 'പൂർണ്ണ സഹോദരൻ്റെ പുത്രന്റെ പുത്രൻ (താഴേക്ക്)', category: 'അസാബ (Residuaries)' },
+  'Paternal Brother': { ml: 'പിതൃ സഹോദരൻ', category: 'അസാബ (Residuaries)' },
+  'Paternal Brother’s Son': { ml: 'പിതൃ സഹോദരൻ്റെ പുത്രൻ', category: 'അസാബ (Residuaries)' },
+  'Paternal Brother’s Sons further down': { ml: 'പിതൃ സഹോദരൻ്റെ പുത്രന്റെ പുത്രൻ (താഴേക്ക്)', category: 'അസാബ (Residuaries)' },
+  'Paternal Uncle': { ml: 'പിതൃ മാമൻ', category: 'അസാബ (Residuaries)' },
+  'Paternal Uncle’s Son': { ml: 'പിതൃ മാമന്റെ പുത്രൻ', category: 'അസാബ (Residuaries)' },
+  'Paternal Uncle’s Son’s Son': { ml: 'പിതൃ മാമന്റെ പുത്രന്റെ പുത്രൻ', category: 'അസാബ (Residuaries)' },
+  'Paternal Great Grandfather': { ml: 'പിതൃ പിതാമഹൻ', category: 'അസാബ (Residuaries)', max: 1 },
+  'Paternal Great Grandmother': { ml: 'പിതൃ പിതാമാഹി', category: 'അസാബ (Residuaries)', max: 1 },
+  'Senior agnatic male': { ml: 'അൽ അംഅം അലാ', category: 'അസാബ (Residuaries)' },
+  'Extended male line': { ml: 'അൽ ബാ’ദു', category: 'അസാബ (Residuaries)' },
+
+  // C) ദൂൽ അർഹാം (Dhul-Arham – 2)
+  'Maternal Brother': { ml: 'മാതൃ സഹോദരൻ', category: 'ദൂൽ അർഹാം (Dhul-Arham)' },
+  'Maternal Uncle': { ml: 'മാതൃ മാമൻ', category: 'ദൂൽ അർഹാം (Dhul-Arham)' }
 };
 
 export type HeirType = keyof typeof HEIR_METADATA;
