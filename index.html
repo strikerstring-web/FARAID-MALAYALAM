@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ml">
 <head>
@@ -32,6 +31,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Elegant Pattern */
     body::before {
       content: "";
       position: absolute;
@@ -39,7 +39,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0l20 20-20 20-20-20zM0 40l20 20-20 20-20-20zM80 40l20 20-20 20-20-20zM40 80l20 20-20 20-20-20z' fill='%23006b46' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0l25 25-25 25-25-25zM0 50l25 25-25 25-25-25zM100 50l25 25-25 25-25-25zM50 100l25 25-25 25-25-25z' fill='%23006b46' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
     }
@@ -52,83 +52,49 @@
       display: none !important;
     }
 
-    /* Rule-compliant Arabic Styling */
+    /* Fixed Arabic Rendering */
     .arabic {
       font-family: 'Noto Naskh Arabic', 'Amiri', serif;
       direction: rtl !important;
       text-align: center !important;
-      font-size: 28px !important;
-      line-height: 1.6 !important;
+      font-size: 26px !important;
+      line-height: 1.8 !important;
       font-weight: 600 !important;
-      letter-spacing: 0px !important;
       unicode-bidi: isolate;
+      color: var(--secondary);
     }
     
     .malayalam {
       font-family: 'Noto Sans Malayalam', sans-serif;
-      letter-spacing: -0.015em;
-      line-height: 1.55;
-      font-feature-settings: "kern", "liga", "palt", "vhal";
-    }
-
-    .malayalam-translation {
-      direction: ltr !important;
-      text-align: center !important;
-      font-size: 16px !important;
-      line-height: 1.5 !important;
-    }
-
-    .word-ready-text {
-      text-align: justify;
-      text-justify: inter-word;
+      letter-spacing: -0.01em;
+      line-height: 1.6;
     }
 
     .glass {
-      background: rgba(255, 255, 255, 0.45);
-      backdrop-filter: blur(28px) saturate(200%);
-      -webkit-backdrop-filter: blur(28px) saturate(200%);
-      border-top: 1px solid rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-top: 1px solid rgba(255, 255, 255, 0.4);
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 24px;
-      box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 28px;
     }
 
     .glass-navy {
-      background: rgba(30, 46, 79, 0.85);
-      backdrop-filter: blur(20px) saturate(150%);
-      -webkit-backdrop-filter: blur(20px) saturate(150%);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 24px;
-      box-shadow: 0px 10px 24px rgba(0, 0, 0, 0.12);
-    }
-
-    .ref-chip {
-      background: linear-gradient(135deg, #006B46, #1E2E4F);
-      font-size: 12px;
-      color: white;
-      padding: 6px 16px;
-      border-radius: 9999px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-
-    @keyframes slideIn {
-      from { transform: translateY(12px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    
-    .animate-in {
-      animation: slideIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      background: linear-gradient(135deg, rgba(30, 46, 79, 0.95), rgba(30, 46, 79, 0.85));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 32px;
     }
 
     .active-press:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
       transition: transform 0.1s ease;
     }
 
@@ -137,6 +103,18 @@
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      animation: fadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    /* Safe Area Padding Utilities */
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    .pt-safe { padding-top: env(safe-area-inset-top); }
   </style>
 <script type="importmap">
 {
