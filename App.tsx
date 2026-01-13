@@ -24,6 +24,7 @@ const stepsOrder = [
   AppStep.DESCRIPTION,
   AppStep.HADITH,
   AppStep.AYAH,
+  AppStep.RULES,
   AppStep.ASSETS,
   AppStep.GENDER,
   AppStep.SELECTION,
@@ -259,7 +260,7 @@ const App: React.FC = () => {
 
   if (step === AppStep.AYAH) {
     return (
-      <ScreenWrapper lang={lang} currentStep={step} nextStep={AppStep.ASSETS} prevStep={AppStep.HADITH} setStep={setStep}>
+      <ScreenWrapper lang={lang} currentStep={step} nextStep={AppStep.RULES} prevStep={AppStep.HADITH} setStep={setStep}>
         <div className="flex-1 flex flex-col justify-center py-8 animate-in space-y-8">
           <div className="w-16 h-16 bg-[#D89F37]/10 rounded-full flex items-center justify-center text-[#D89F37] mx-auto">
              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
@@ -276,9 +277,42 @@ const App: React.FC = () => {
     );
   }
 
+  if (step === AppStep.RULES) {
+    return (
+      <ScreenWrapper lang={lang} currentStep={step} nextStep={AppStep.ASSETS} prevStep={AppStep.AYAH} setStep={setStep}>
+        <header className="shrink-0 py-6 text-center space-y-2">
+          <h2 className="text-3xl font-black text-[#1E2E4F]">{t('rules_title')}</h2>
+          <p className="text-slate-500 font-bold">{t('rules_subtitle')}</p>
+        </header>
+
+        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar space-y-5 pb-8">
+          <div className="glass-card p-6 space-y-3 shadow-md border-l-4 border-[#006B46]">
+            <h3 className="font-black text-[#1E2E4F] text-lg">{t('fixed_shares_title')}</h3>
+            <p className="text-slate-600 leading-relaxed text-sm">{t('fixed_shares_desc')}</p>
+          </div>
+          
+          <div className="glass-card p-6 space-y-3 shadow-md border-l-4 border-[#D89F37]">
+            <h3 className="font-black text-[#1E2E4F] text-lg">{t('asabah_title')}</h3>
+            <p className="text-slate-600 leading-relaxed text-sm">{t('asabah_desc')}</p>
+          </div>
+
+          <div className="glass-card p-6 space-y-3 shadow-md border-l-4 border-rose-800">
+            <h3 className="font-black text-[#1E2E4F] text-lg">{t('hijb_title')}</h3>
+            <p className="text-slate-600 leading-relaxed text-sm">{t('hijb_desc')}</p>
+          </div>
+          
+          <div className="p-4 text-center opacity-40">
+            <div className="w-12 h-1 bg-slate-300 mx-auto rounded-full mb-2"></div>
+            <p className="text-[10px] uppercase font-black tracking-widest">Al-Shafi'i Jurisprudence</p>
+          </div>
+        </div>
+      </ScreenWrapper>
+    );
+  }
+
   if (step === AppStep.ASSETS) {
     return (
-      <ScreenWrapper lang={lang} currentStep={step} nextStep={AppStep.GENDER} prevStep={AppStep.AYAH} setStep={setStep}>
+      <ScreenWrapper lang={lang} currentStep={step} nextStep={AppStep.GENDER} prevStep={AppStep.RULES} setStep={setStep}>
         <header className="shrink-0 py-6 text-center space-y-2">
           <h2 className="text-3xl font-black text-[#1E2E4F]">{t('estate_info')}</h2>
           <p className="text-slate-500 font-bold">{t('estate_subtitle')}</p>
