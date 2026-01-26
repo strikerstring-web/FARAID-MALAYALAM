@@ -50,7 +50,16 @@ export const translations = {
     excluded: "Excluded",
     aul_warning: "Aul Applied: Shares exceeded total, adjusted proportionally.",
     radd_warning: "Radd Applied: Residue returned to eligible sharers.",
-    continue: "Continue"
+    continue: "Continue",
+    share_results: "Share Results",
+    qr_title: "Scan to Share",
+    qr_desc: "Scan this QR code to view and share the distribution summary.",
+    close: "Close",
+    error_no_heirs: "Please select at least one heir to calculate.",
+    error_liabilities_exceed_assets: "Liabilities exceed total assets. There is no inheritance to distribute.",
+    error_will_limit: "Note: The will (Wasiyyah) cannot exceed 1/3 of the estate. It has been capped at 1/3 for calculation.",
+    error_invalid_assets: "Please enter a valid amount for total assets.",
+    error_general: "An unexpected error occurred during calculation. Please try again."
   },
   ml: {
     select_language: "ഭാഷ തിരഞ്ഞെടുക്കുക",
@@ -102,7 +111,16 @@ export const translations = {
     excluded: "ഒഴിവാക്കപ്പെട്ടു",
     aul_warning: "ഔൽ (Aul): വിഹിതങ്ങൾ പരിധിയേക്കാൾ കൂടുതലായതിനാൽ ക്രമീകരിച്ചു.",
     radd_warning: "റദ്ദ് (Radd): അവശേഷിക്കുന്ന വിഹിതം അർഹരായവർക്ക് വീതിച്ചു നൽകി.",
-    continue: "തുടരുക"
+    continue: "തുടരുക",
+    share_results: "പങ്കുവെക്കുക",
+    qr_title: "സ്കാൻ ചെയ്യുക",
+    qr_desc: "വിഹിത വിവരങ്ങൾ പങ്കുവെക്കാൻ ഈ QR കോഡ് ഉപയോഗിക്കുക.",
+    close: "അടയ്ക്കുക",
+    error_no_heirs: "കണക്കാക്കുന്നതിനായി കുറഞ്ഞത് ഒരു അവകാശിെയെങ്കിലും തിരഞ്ഞെടുക്കുക.",
+    error_liabilities_exceed_assets: "ബാധ്യതകൾ മൊത്തം ആസ്തിയേക്കാൾ കൂടുതലാണ്. വിതരണം ചെയ്യാൻ സ്വത്ത് അവശേഷിക്കുന്നില്ല.",
+    error_will_limit: "ശ്രദ്ധിക്കുക: വസീയ്യത്ത് ആസ്തിയുടെ 1/3-ൽ കൂടാൻ പാടില്ല. കണക്കുകൂട്ടലിനായി ഇത് 1/3 ആയി നിജപ്പെടുത്തിയിട്ടുണ്ട്.",
+    error_invalid_assets: "മൊത്തം ആസ്തിയായി കൃത്യമായ ഒരു തുക നൽകുക.",
+    error_general: "കണക്കുകൂട്ടലിൽ ഒരു പിശക് സംഭവിച്ചു. ദയവായി വീണ്ടും ശ്രമിക്കുക."
   },
   ta: {
     select_language: "மொழியைத் தேர்ந்தெடுக்கவும்",
@@ -154,7 +172,16 @@ export const translations = {
     excluded: "விலக்கப்பட்டது",
     aul_warning: "அவ்ல்: பங்குகள் சொத்தை விட அதிகமாக இருந்ததால் விகிதாசாரப்படி சரி செய்யப்பட்டது.",
     radd_warning: "ரத்: மீதமுள்ள பங்குகள் தகுதியுள்ளவர்களுக்கு திரும்ப வழங்கப்பட்டது.",
-    continue: "தொடரவும்"
+    continue: "தொடரவும்",
+    share_results: "முடிவுகளைப் பகிரவும்",
+    qr_title: "பகிர ஸ்கேன் செய்யவும்",
+    qr_desc: "இந்த QR குறியீட்டை ஸ்கேன் செய்து விநியோகச் சுருக்கத்தைப் பகிரவும்.",
+    close: "மூடு",
+    error_no_heirs: "கணக்கிட குறைந்தது ஒரு வாரிசையாவது தேர்ந்தெடுக்கவும்.",
+    error_liabilities_exceed_assets: "கடன்கள் மொத்த சொத்துக்களை விட அதிகமாக உள்ளன. விநியோகிக்க சொத்து இல்லை.",
+    error_will_limit: "குறிப்பு: வசீயத் சொத்தில் 1/3 பங்குக்கு மேல் இருக்கக்கூடாது. கணக்கீட்டிற்காக இது 1/3 ஆகக் குறைக்கப்பட்டுள்ளது.",
+    error_invalid_assets: "மொத்த சொத்துக்களுக்கு சரியான தொகையை உள்ளிடவும்.",
+    error_general: "கணக்கீட்டின் போது எதிர்பாராத பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்."
   },
   ar: {
     select_language: "اختر اللغة",
@@ -206,6 +233,15 @@ export const translations = {
     excluded: "محجوب",
     aul_warning: "تم تطبيق العول: الأنصبة زادت عن أصل المسألة.",
     radd_warning: "تم تطبيق الرد: المتبقي رُدّ على أصحاب الفروض.",
-    continue: "استمرار"
+    continue: "استمرار",
+    share_results: "مشاركة النتائج",
+    qr_title: "امسح للمشاركة",
+    qr_desc: "امسح رمز الاستجابة السريعة لمشاركة ملخص التوزيع.",
+    close: "إغلاق",
+    error_no_heirs: "يرجى اختيار وارث واحد على الأقل للحساب.",
+    error_liabilities_exceed_assets: "الخصوم تتجاوز إجمالي الأصول. لا يوجد ميراث للتوزيع.",
+    error_will_limit: "ملاحظة: الوصية لا يمكن أن تتجاوز ثلث التركة. تم تحديدها بالثلث للحساب.",
+    error_invalid_assets: "يرجى إدخال مبلغ صحيح لإجمالي الأصول.",
+    error_general: "حدث خطأ غير متوقع أثناء الحساب. يرجى المحاولة مرة أخرى."
   }
 };

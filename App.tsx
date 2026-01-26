@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AppStep, Heir, HeirType, CalculationResult, HEIR_METADATA, HEIR_ORDER, EstateData, Language } from './types';
 import { calculateShares } from './logic/faraidEngine';
 import { translations } from './translations';
+import { QRCodeCanvas } from 'qrcode.react';
 
 /** 
  * ScreenWrapper provides a strict layout grid to prevent UI intersections
@@ -101,6 +102,8 @@ const App: React.FC = () => {
   const [heirs, setHeirs] = useState<Heir[]>([]);
   const [estate, setEstate] = useState<EstateData>({ totalAssets: 0, debts: 0, funeral: 0, will: 0 });
   const [result, setResult] = useState<CalculationResult | null>(null);
+  const [showQR, setShowQR] = useState(false);
+  const [uiError, setUiError] = useState<string | null>(null);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('appLanguage') as Language;
@@ -135,9 +138,34 @@ const App: React.FC = () => {
   const getHeirCount = (type: HeirType) => heirs.find(h => h.type === type)?.count || 0;
 
   const handleCalculate = () => {
-    if (deceasedGender) {
-      setResult(calculateShares(heirs, deceasedGender, estate, lang));
-      setStep(AppStep.RESULT);
+    setUiError(null);
+
+    // 1. Validation: No heirs selected
+    if (heirs.length === 0) {
+      setUiError(t('error_no_heirs'));
+      return;
+    }
+
+    // 2. Validation: Estate Assets <= Liabilities
+    const totalLiabilities = estate.debts + estate.funeral + estate.will;
+    if (estate.totalAssets <= (estate.debts + estate.funeral)) {
+      setUiError(t('error_liabilities_exceed_assets'));
+      return;
+    }
+
+    if (estate.totalAssets <= 0) {
+      setUiError(t('error_invalid_assets'));
+      return;
+    }
+
+    try {
+      if (deceasedGender) {
+        setResult(calculateShares(heirs, deceasedGender, estate, lang));
+        setStep(AppStep.RESULT);
+      }
+    } catch (e) {
+      console.error(e);
+      setUiError(t('error_general'));
     }
   };
 
@@ -146,7 +174,21 @@ const App: React.FC = () => {
     setDeceasedGender(null);
     setEstate({ totalAssets: 0, debts: 0, funeral: 0, will: 0 });
     setResult(null);
+    setShowQR(false);
+    setUiError(null);
     setStep(AppStep.WELCOME);
+  };
+
+  const getShareSummary = () => {
+    if (!result) return "";
+    let summary = `*${t('distribution_result')}*\n`;
+    summary += `${t('net_estate')}: ₹${result.netEstate.toLocaleString()}\n\n`;
+    result.shares.forEach(s => {
+      if (s.amountEach > 0) {
+        summary += `• ${s.label} (${s.count}): ₹${Math.floor(s.amountEach).toLocaleString()} ${t('per_person')}\n`;
+      }
+    });
+    return summary;
   };
 
   if (step === AppStep.LANGUAGE_SELECT) {
@@ -158,7 +200,7 @@ const App: React.FC = () => {
           <h1 className="text-2xl font-black text-white/70 arabic" dir="rtl">اختر اللغة</h1>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
+        <div className="grid grid-cols-2 gap-4 w-full max-sm:px-4 max-w-sm mx-auto">
           {[
             { id: 'en', label: 'English' },
             { id: 'ml', label: 'മലയാളം' },
@@ -395,8 +437,9 @@ const App: React.FC = () => {
                 <div key={type} className="flex flex-col">
                   <div className="flex items-center justify-between p-5 h-[80px]">
                     <div className="flex flex-col gap-0.5">
-                      <span className="font-bold text-[#1E2E4F] tracking-tight">{type}</span>
-                      <span className="text-[11px] text-slate-400 font-medium">{meta[lang]}</span>
+                      <span className={`font-bold text-[#1E2E4F] tracking-tight ${lang === 'ar' ? 'text-lg' : ''}`}>
+                        {meta[lang]}
+                      </span>
                     </div>
                     <div className="flex items-center gap-3 bg-slate-100/50 p-1.5 rounded-2xl shadow-inner border border-white/20">
                       <button 
@@ -422,6 +465,12 @@ const App: React.FC = () => {
           </div>
         </div>
 
+        {uiError && (
+          <div className="mb-4 p-4 bg-rose-50 text-rose-700 rounded-2xl text-sm font-bold malayalam animate-in flex items-center gap-3 border border-rose-100">
+            <span className="text-lg">⚠️</span> {uiError}
+          </div>
+        )}
+
         <div className="shrink-0 pb-8 flex flex-col gap-3">
           <button 
             onClick={handleCalculate} 
@@ -445,7 +494,15 @@ const App: React.FC = () => {
     const isRtl = lang === 'ar';
     return (
       <div className="h-full flex flex-col overflow-hidden bg-transparent pt-safe" dir={isRtl ? 'rtl' : 'ltr'}>
-        <header className="px-6 py-6 text-center space-y-6 shrink-0">
+        <header className="px-6 py-6 text-center space-y-6 shrink-0 relative">
+          <div className={`absolute top-6 ${isRtl ? 'left-6' : 'right-6'} z-50`}>
+            <button 
+              onClick={() => setShowQR(true)}
+              className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-[#1E2E4F] active-press border border-slate-100"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" /></svg>
+            </button>
+          </div>
           <h2 className="text-3xl font-black text-[#1E2E4F] tracking-tight">{t('distribution_result')}</h2>
           <div className="glass-navy p-8 text-white space-y-1 shadow-2xl">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">{t('net_estate')}</p>
@@ -470,14 +527,14 @@ const App: React.FC = () => {
 
           {result.warnings.length > 0 && result.warnings.map((w, i) => (
              <div key={i} className="bg-amber-50/70 border border-amber-100 p-5 rounded-2xl text-amber-800 text-[13px] font-bold flex gap-3 shadow-sm animate-in backdrop-blur-sm">
-               <span className="text-lg">⚠️</span> {w}
+               <span className="text-lg">⚠️</span> {t(w)}
              </div>
           ))}
           
           <div className="space-y-4 pb-12">
             <h3 className="px-2 font-black text-[#1E2E4F] text-[13px] uppercase tracking-widest opacity-40">{t('individual_shares')}</h3>
             {result.shares.map((s, i) => (
-              <div key={i} className={`glass-card p-6 flex flex-col gap-4 border-${isRtl ? 'r' : 'l'}-8 border-${isRtl ? 'r' : 'l'}--[#006B46] animate-in shadow-md hover:scale-[1.01] transition-all`}>
+              <div key={i} className={`glass-card p-6 flex flex-col gap-4 border-${isRtl ? 'r' : 'l'}-8 border-${isRtl ? 'r' : 'l'}-[#006B46] animate-in shadow-md hover:scale-[1.01] transition-all`}>
                 <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                         <p className="font-black text-[#1E2E4F] text-lg leading-tight">{s.label}</p>
@@ -503,7 +560,7 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="px-6 py-8 glass rounded-t-[40px] shadow-2xl shrink-0 pb-safe">
+        <div className="px-6 py-8 glass rounded-t-[40px] shadow-2xl shrink-0 pb-safe grid grid-cols-1 gap-4">
           <button 
             onClick={reset} 
             className="w-full bg-[#1E2E4F] text-white py-5 rounded-2xl font-black text-xl active-press shadow-xl shadow-[#1E2E4F]/20"
@@ -511,6 +568,43 @@ const App: React.FC = () => {
             {t('new_calculation')}
           </button>
         </div>
+
+        {/* QR Share Modal */}
+        {showQR && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in">
+            <div className="absolute inset-0 bg-[#1E2E4F]/80 backdrop-blur-md" onClick={() => setShowQR(false)}></div>
+            <div className="relative glass-card p-10 w-full max-w-sm flex flex-col items-center gap-8 shadow-2xl mx-auto">
+              <div className="text-center space-y-2">
+                <h3 className="text-2xl font-black text-[#1E2E4F]">{t('qr_title')}</h3>
+                <p className="text-slate-500 text-sm font-medium">{t('qr_desc')}</p>
+              </div>
+              
+              <div className="bg-white p-6 rounded-[32px] shadow-inner border-4 border-slate-50">
+                <QRCodeCanvas 
+                  value={getShareSummary()} 
+                  size={200}
+                  level="M"
+                  includeMargin={false}
+                  imageSettings={{
+                    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23006B46'%3E%3Cpath d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.247 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'/%3E%3C/svg%3E",
+                    x: undefined,
+                    y: undefined,
+                    height: 30,
+                    width: 30,
+                    excavate: true,
+                  }}
+                />
+              </div>
+
+              <button 
+                onClick={() => setShowQR(false)}
+                className="w-full bg-[#1E2E4F] text-white py-4 rounded-2xl font-bold text-lg active-press"
+              >
+                {t('close')}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

@@ -5,7 +5,15 @@ import { Heir, CalculationResult, HeirType, EstateData, HEIR_METADATA, HEIR_ORDE
  * Strictly follows Shāfiʿī rules for Zawil Furud, Asabah, Hijb, Aul, and Radd.
  */
 export const calculateShares = (heirs: Heir[], deceasedGender: 'Male' | 'Female', estate: EstateData, lang: Language = 'en'): CalculationResult => {
-  const netEstate = Math.max(0, estate.totalAssets - (estate.debts + estate.funeral + estate.will));
+  // Validate basic estate data
+  const totalLiabilitiesBeforeWill = estate.debts + estate.funeral;
+  const remainingAfterBasicLiabilities = Math.max(0, estate.totalAssets - totalLiabilitiesBeforeWill);
+  
+  // Wasiyyah (Will) rule: Cannot exceed 1/3 of the remaining estate after debts and funeral expenses
+  const maxWillAllowed = remainingAfterBasicLiabilities / 3;
+  const actualWill = Math.min(estate.will, maxWillAllowed);
+  
+  const netEstate = Math.max(0, remainingAfterBasicLiabilities - actualWill);
   
   const hMap = heirs.reduce((acc, h) => {
     acc[h.type] = h.count;
@@ -136,6 +144,11 @@ export const calculateShares = (heirs: Heir[], deceasedGender: 'Male' | 'Female'
     summary: { fixedTotal: 0, residueTotal: 0, aulApplied, raddApplied: false },
     warnings: []
   };
+
+  // Warning for Will reduction
+  if (estate.will > maxWillAllowed) {
+    result.warnings.push('error_will_limit');
+  }
 
   sharers.forEach(s => {
     let actualCount = 1;
