@@ -13,6 +13,33 @@ export enum AppStep {
 
 export type Language = 'en' | 'ml' | 'ta' | 'ar';
 
+export type LandUnit = 'acre' | 'cent' | 'sqft' | 'sqm';
+
+export interface DetailedAssets {
+  enabled: boolean;
+  land: {
+    area: number;
+    unit: LandUnit;
+    valuePerUnit: number;
+  };
+  gold: {
+    weight: number; // in grams
+    ratePerGram: number;
+  };
+  silver: {
+    weight: number; // in grams
+    ratePerGram: number;
+  };
+  otherCash: number;
+}
+
+export interface DetailedWasiyyah {
+  cash: number;
+  landArea: number;
+  goldWeight: number;
+  silverWeight: number;
+}
+
 export const HEIR_ORDER: string[] = [
   'Husband', 'Wives', 'Sons', 'Daughters', 'Grandsons', 'Granddaughters',
   'Father', 'Mother', 'Grandfather', 'Paternal Grandmother', 'Maternal Grandmother',
@@ -29,13 +56,13 @@ export const HEIR_METADATA: Record<string, { en: string, ml: string, ta: string,
   'Wives': { en: 'Wives', ml: 'ഭാര്യമാർ', ta: 'மனைவிகள்', ar: 'الزوجات', max: 4 },
   'Sons': { en: 'Sons', ml: 'പുത്രന്മാർ', ta: 'மகன்கள்', ar: 'الأبناء' },
   'Daughters': { en: 'Daughters', ml: 'പുത്രിമാർ', ta: 'மகள்கள்', ar: 'البنات' },
-  'Grandsons': { en: 'Grandsons', ml: 'പുത്ര പുത്രന്മാർ', ta: 'பேரன்கள்', ar: 'أبناء الابن' },
-  'Granddaughters': { en: 'Granddaughters', ml: 'പുത്ര പുത്രിമാർ', ta: 'பேத்திகள்', ar: 'بنات الابن' },
+  'Grandsons': { en: 'Grandsons', ml: 'പുത്ര പുത്രന്മാർ', ta: 'പേരன்கள்', ar: 'أبناء الابن' },
+  'Granddaughters': { en: 'Granddaughters', ml: 'പുത്ര പുത്രിമാർ', ta: 'പേത്തികൾ', ar: 'ബനാതുൽ ഇബ്ൻ' },
   'Father': { en: 'Father', ml: 'പിതാവ്', ta: 'தந்தை', ar: 'الأب', max: 1 },
-  'Mother': { en: 'Mother', ml: 'മാതാവ്', ta: 'தாய்', ar: 'الأم', max: 1 },
+  'Mother': { en: 'Mother', ml: 'മാതാവ്', ta: 'തாய்', ar: 'الأم', max: 1 },
   'Grandfather': { en: 'Grandfather', ml: 'പിതാമഹൻ', ta: 'தாத்தா', ar: 'الجد', max: 1 },
   'Paternal Grandmother': { en: 'Paternal Grandmother', ml: 'പിതാമഹി', ta: 'தந்தை வழி பாட்டி', ar: 'الجدة لأب', max: 1 },
-  'Maternal Grandmother': { en: 'Maternal Grandmother', ml: 'മാതാമഹി', ta: 'தாய் வழி பாட்டி', ar: 'الجدة لأم', max: 1 },
+  'Maternal Grandmother': { en: 'Maternal Grandmother', ml: 'മാതാമഹി', ta: 'തായ് வழி பாட்டி', ar: 'الجدة لأം', max: 1 },
   'Full Brothers': { en: 'Full Brothers', ml: 'പൂർണ്ണ സഹോദരങ്ങൾ', ta: 'உடன் பிறந்த சகோதரர்கள்', ar: 'الإخوة الأشقاء' },
   'Full Sisters': { en: 'Full Sisters', ml: 'പൂർണ്ണ സഹോദരിമാർ', ta: 'உடன் பிறந்த சகோதரிகள்', ar: 'الأخوات الشقيقات' },
   'Paternal Brothers': { en: 'Paternal Brothers', ml: 'പിതൃവംശ സഹോദരങ്ങൾ', ta: 'தந்தை வழி சகோதரர்கள்', ar: 'الإخوة لأب' },
@@ -47,13 +74,13 @@ export const HEIR_METADATA: Record<string, { en: string, ml: string, ta: string,
   'Full Nephew’s Sons': { en: 'Full Nephew’s Sons', ml: 'പൂർണ്ണ സഹോദരന്റെ പുത്രന്റെ പുത്രൻ', ta: 'பேரன் (சகோதரர் வழி)', ar: 'أبناء ابن الأخ الشقيق' },
   'Paternal Nephew’s Sons': { en: 'Paternal Nephew’s Sons', ml: 'പിതൃവംശ സഹോദരന്റെ പുത്രന്റെ പുത്രൻ', ta: 'தந்தை வழி சகோதரர் பேரன்', ar: 'أبناء ابن الأخ لأب' },
   'Full Paternal Uncles': { en: 'Full Paternal Uncles', ml: 'പിതാവിന്റെ പൂർണ്ണ സഹോദരൻ', ta: 'பெரியப்பா/சித்தப்பா', ar: 'الأعمام الأشقاء' },
-  'Paternal Paternal Uncles': { en: 'Paternal Paternal Uncles', ml: 'പിതാവിന്റെ പിതൃവംശ സഹോദരൻ', ta: 'தந்தை வழி மாமாக்கள்', ar: 'الأعمام لأب' },
+  'Paternal Paternal Uncles': { en: 'Paternal Paternal Uncles', ml: 'പിതാവിന്റെ പിതൃവംശ സഹോദരൻ', ta: 'தந்தை வழி மாماக்கள்', ar: 'الأعمام لأب' },
   'Full Cousins': { en: 'Full Cousins', ml: 'പിതാവിന്റെ പൂർണ്ണ സഹോദരന്റെ പുത്രൻ', ta: 'பெரியப்பா/சித்தப்பா மகன்', ar: 'أبناء العم الشقيق' },
   'Paternal Cousins': { en: 'Paternal Cousins', ml: 'പിതാവിന്റെ പിതൃവംശ സഹോദരന്റെ പുത്രൻ', ta: 'தந்தை வழி உறவினர் மகன்', ar: 'أبناء العم لأب' },
   'Full Cousin’s Sons': { en: 'Full Cousin’s Sons', ml: 'പിതാവിന്റെ പൂർണ്ണ സഹോദരന്റെ പുത്രന്റെ പുത്രൻ', ta: 'உறவினர் பேரன்', ar: 'أبناء ابن العم الشقيق' },
   'Paternal Cousin’s Sons': { en: 'Paternal Cousin’s Sons', ml: 'പിതാവിന്റെ പിതൃവംശ സഹോദരന്റെ പുത്രന്റെ പുത്രൻ', ta: 'தந்தை வழி உறவினர் பேரன்', ar: 'أبناء ابن العم لأب' },
   'Full Cousin’s Grandsons': { en: 'Full Cousin’s Grandsons', ml: 'പിതാവിന്റെ പൂർണ്ണ സഹോദരന്റെ പുത്രന്റെ പുത്രന്റെ പുത്രൻ', ta: 'உறவினர் கொள்ளுப்பேரன்', ar: 'أبناء ابن ابن العم الشقيق' },
-  'Paternal Cousin’s Grandsons': { en: 'Paternal Cousin’s Grandsons', ml: 'പിതാവിന്റെ പിതൃവംശ സഹോദരന്റെ പുത്രന്റെ പുത്രന്റെ പുത്രൻ', ta: 'தந்தை വഴി உறவினர் கொள்ளுப்பேரன்', ar: 'أبناء ابن ابن العم لأب' }
+  'Paternal Cousin’s Grandsons': { en: 'Paternal Cousin’s Grandsons', ml: 'പിതാവിന്റെ പിതൃവംശ സഹോദരന്റെ പുത്രന്റെ പുത്രന്റെ പുത്രൻ', ta: 'தந்தை வழி உறவினர் கொள்ளுப்பேரன்', ar: 'أبناء ابن ابن العم لأب' }
 };
 
 export type HeirType = keyof typeof HEIR_METADATA;
@@ -68,6 +95,8 @@ export interface EstateData {
   debts: number;
   funeral: number;
   will: number;
+  detailed?: DetailedAssets;
+  detailedWill?: DetailedWasiyyah;
 }
 
 export interface CalculationResult {
@@ -77,11 +106,20 @@ export interface CalculationResult {
     symbol: string, 
     fraction: string, 
     percentage: string, 
-    amount: number, 
+    amount: number, // Cash component
+    landAmount: number,
+    goldAmount: number,
+    silverAmount: number,
     count: number,
-    amountEach: number 
+    amountEach: number,
+    landEach: number,
+    goldEach: number,
+    silverEach: number
   }>;
-  netEstate: number;
+  netEstate: number; // Net Cash Estate
+  totalLand: number;
+  totalGold: number;
+  totalSilver: number;
   summary: {
     fixedTotal: number;
     residueTotal: number;

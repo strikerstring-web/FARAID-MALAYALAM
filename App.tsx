@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppStep, Heir, HeirType, CalculationResult, HEIR_METADATA, HEIR_ORDER, EstateData, Language } from './types';
+import { AppStep, Heir, HeirType, CalculationResult, HEIR_METADATA, HEIR_ORDER, EstateData, Language, DetailedAssets, LandUnit, DetailedWasiyyah } from './types';
 import { calculateShares } from './logic/faraidEngine';
 import { translations } from './translations';
 import { QRCodeCanvas } from 'qrcode.react';
@@ -101,6 +101,19 @@ const App: React.FC = () => {
   const [deceasedGender, setDeceasedGender] = useState<'Male' | 'Female' | null>(null);
   const [heirs, setHeirs] = useState<Heir[]>([]);
   const [estate, setEstate] = useState<EstateData>({ totalAssets: 0, debts: 0, funeral: 0, will: 0 });
+  const [detailedAssets, setDetailedAssets] = useState<DetailedAssets>({
+    enabled: false,
+    land: { area: 0, unit: 'cent', valuePerUnit: 0 },
+    gold: { weight: 0, ratePerGram: 0 },
+    silver: { weight: 0, ratePerGram: 0 },
+    otherCash: 0
+  });
+  const [detailedWill, setDetailedWill] = useState<DetailedWasiyyah>({
+    cash: 0,
+    landArea: 0,
+    goldWeight: 0,
+    silverWeight: 0
+  });
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [showQR, setShowQR] = useState(false);
   const [uiError, setUiError] = useState<string | null>(null);
@@ -140,26 +153,32 @@ const App: React.FC = () => {
   const handleCalculate = () => {
     setUiError(null);
 
-    // 1. Validation: No heirs selected
+    const landValue = detailedAssets.enabled ? (detailedAssets.land.area * detailedAssets.land.valuePerUnit) : 0;
+    const goldValue = detailedAssets.enabled ? (detailedAssets.gold.weight * detailedAssets.gold.ratePerGram) : 0;
+    const silverValue = detailedAssets.enabled ? (detailedAssets.silver.weight * detailedAssets.silver.ratePerGram) : 0;
+    const cashValue = detailedAssets.enabled ? detailedAssets.otherCash : estate.totalAssets;
+    
+    const finalTotalValue = cashValue + landValue + goldValue + silverValue;
+
     if (heirs.length === 0) {
       setUiError(t('error_no_heirs'));
       return;
     }
 
-    // 2. Validation: Estate Assets <= Liabilities
-    if (estate.totalAssets <= (estate.debts + estate.funeral)) {
+    if (finalTotalValue <= (estate.debts + estate.funeral)) {
       setUiError(t('error_liabilities_exceed_assets'));
       return;
     }
 
-    if (estate.totalAssets <= 0) {
+    if (finalTotalValue <= 0) {
       setUiError(t('error_invalid_assets'));
       return;
     }
 
     try {
       if (deceasedGender) {
-        setResult(calculateShares(heirs, deceasedGender, estate, lang));
+        const res = calculateShares(heirs, deceasedGender, { ...estate, totalAssets: cashValue, detailed: detailedAssets, detailedWill }, lang);
+        setResult(res);
         setStep(AppStep.RESULT);
       }
     } catch (e) {
@@ -172,6 +191,19 @@ const App: React.FC = () => {
     setHeirs([]);
     setDeceasedGender(null);
     setEstate({ totalAssets: 0, debts: 0, funeral: 0, will: 0 });
+    setDetailedAssets({
+      enabled: false,
+      land: { area: 0, unit: 'cent', valuePerUnit: 0 },
+      gold: { weight: 0, ratePerGram: 0 },
+      silver: { weight: 0, ratePerGram: 0 },
+      otherCash: 0
+    });
+    setDetailedWill({
+      cash: 0,
+      landArea: 0,
+      goldWeight: 0,
+      silverWeight: 0
+    });
     setResult(null);
     setShowQR(false);
     setUiError(null);
@@ -180,11 +212,13 @@ const App: React.FC = () => {
 
   const getShareSummary = () => {
     if (!result) return "";
-    let summary = `*${t('distribution_result')}*\n`;
-    summary += `${t('net_estate')}: ₹${result.netEstate.toLocaleString()}\n\n`;
+    let summary = `*${t('distribution_result')}*\n\n`;
     result.shares.forEach(s => {
-      if (s.amountEach > 0) {
-        summary += `• ${s.label} (${s.count}): ₹${Math.floor(s.amountEach).toLocaleString()} ${t('per_person')}\n`;
+      if (s.amountEach > 0 || s.landEach > 0) {
+        summary += `• ${s.label} (${s.count}):\n`;
+        if (s.amountEach > 0) summary += `  - Cash: ₹${Math.floor(s.amountEach).toLocaleString()}\n`;
+        if (s.landEach > 0) summary += `  - Land: ${s.landEach.toFixed(3)} ${detailedAssets.land.unit}\n`;
+        summary += `\n`;
       }
     });
     return summary;
@@ -215,9 +249,6 @@ const App: React.FC = () => {
               <span className="text-white/40 text-[10px] uppercase tracking-widest">{l.id}</span>
             </button>
           ))}
-          <button className="col-span-2 py-4 text-white/30 text-xs font-bold uppercase tracking-widest border border-white/5 rounded-2xl">
-            More Languages (Future)
-          </button>
         </div>
       </div>
     );
@@ -352,19 +383,144 @@ const App: React.FC = () => {
   }
 
   if (step === AppStep.ASSETS) {
+    const isRtl = lang === 'ar';
     return (
       <ScreenWrapper lang={lang} currentStep={step} nextStep={AppStep.GENDER} prevStep={AppStep.RULES} setStep={setStep}>
         <header className="shrink-0 py-6 text-center space-y-2">
           <h2 className="text-3xl font-black text-[#1E2E4F]">{t('estate_info')}</h2>
-          <p className="text-slate-500 font-bold">{t('estate_subtitle')}</p>
+          <div className="flex justify-center gap-2">
+            <button 
+              onClick={() => setDetailedAssets({...detailedAssets, enabled: false})}
+              className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${!detailedAssets.enabled ? 'bg-[#1E2E4F] text-white' : 'bg-slate-200 text-slate-500'}`}
+            >
+              {t('simple_assets')}
+            </button>
+            <button 
+              onClick={() => setDetailedAssets({...detailedAssets, enabled: true})}
+              className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${detailedAssets.enabled ? 'bg-[#006B46] text-white' : 'bg-slate-200 text-slate-500'}`}
+            >
+              {t('advanced_assets')}
+            </button>
+          </div>
         </header>
 
         <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar space-y-5 pb-8">
+          {!detailedAssets.enabled ? (
+            <div className="glass-card p-6 space-y-3 shadow-md">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">💰</span>
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('total_assets')}</label>
+              </div>
+              <div className="relative">
+                <span className={`absolute ${isRtl ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300 ${isRtl ? 'mr-1' : 'ml-1'}`}>₹</span>
+                <input 
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={estate.totalAssets || ''}
+                  onChange={e => setEstate({...estate, totalAssets: Math.max(0, Number(e.target.value))})}
+                  className={`w-full bg-transparent border-b-2 border-slate-100 py-3 ${isRtl ? 'pr-8 pl-0 text-right' : 'pl-8 text-left'} text-2xl font-black text-[#1E2E4F] outline-none focus:border-[#006B46] transition-colors`}
+                />
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* ASSETS SECTION */}
+              <div className="glass-card p-6 space-y-4 shadow-md bg-white/40">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-[#006B46]">{t('land_details')}</h3>
+                  <div className="flex gap-1">
+                    {(['acre', 'cent', 'sqft', 'sqm'] as LandUnit[]).map(u => (
+                      <button 
+                        key={u} 
+                        onClick={() => setDetailedAssets({ ...detailedAssets, land: { ...detailedAssets.land, unit: u } })}
+                        className={`px-2 py-1 rounded text-[8px] font-bold uppercase ${detailedAssets.land.unit === u ? 'bg-[#006B46] text-white' : 'bg-slate-100 text-slate-400'}`}
+                      >
+                        {t(u)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('land_area')}</label>
+                    <input type="number" value={detailedAssets.land.area || ''} onChange={e => setDetailedAssets({...detailedAssets, land: {...detailedAssets.land, area: Math.max(0, Number(e.target.value))}})} className="w-full bg-slate-50 border-b-2 border-transparent focus:border-[#006B46] p-2 text-lg font-black text-[#1E2E4F] outline-none rounded-lg" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('value_per_unit')}</label>
+                    <input type="number" value={detailedAssets.land.valuePerUnit || ''} onChange={e => setDetailedAssets({...detailedAssets, land: {...detailedAssets.land, valuePerUnit: Math.max(0, Number(e.target.value))}})} className="w-full bg-slate-50 border-b-2 border-transparent focus:border-[#006B46] p-2 text-lg font-black text-[#1E2E4F] outline-none rounded-lg" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="glass-card p-6 space-y-4 shadow-md bg-white/40">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-[#D89F37]">{t('gold_details')}</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Weight (g)</label>
+                      <input type="number" value={detailedAssets.gold.weight || ''} onChange={e => setDetailedAssets({...detailedAssets, gold: {...detailedAssets.gold, weight: Math.max(0, Number(e.target.value))}})} className="w-full bg-slate-50 p-2 text-lg font-black text-[#1E2E4F] outline-none rounded-lg" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Rate (₹)</label>
+                      <input type="number" value={detailedAssets.gold.ratePerGram || ''} onChange={e => setDetailedAssets({...detailedAssets, gold: {...detailedAssets.gold, ratePerGram: Math.max(0, Number(e.target.value))}})} className="w-full bg-slate-50 p-2 text-lg font-black text-[#1E2E4F] outline-none rounded-lg" />
+                    </div>
+                  </div>
+                </div>
+                <div className="glass-card p-6 space-y-4 shadow-md bg-white/40">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t('silver_details')}</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Weight (g)</label>
+                      <input type="number" value={detailedAssets.silver.weight || ''} onChange={e => setDetailedAssets({...detailedAssets, silver: {...detailedAssets.silver, weight: Math.max(0, Number(e.target.value))}})} className="w-full bg-slate-50 p-2 text-lg font-black text-[#1E2E4F] outline-none rounded-lg" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Rate (₹)</label>
+                      <input type="number" value={detailedAssets.silver.ratePerGram || ''} onChange={e => setDetailedAssets({...detailedAssets, silver: {...detailedAssets.silver, ratePerGram: Math.max(0, Number(e.target.value))}})} className="w-full bg-slate-50 p-2 text-lg font-black text-[#1E2E4F] outline-none rounded-lg" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass-card p-6 space-y-4 shadow-md bg-white/40">
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-600">{t('other_cash')}</h3>
+                <input type="number" value={detailedAssets.otherCash || ''} onChange={e => setDetailedAssets({...detailedAssets, otherCash: Math.max(0, Number(e.target.value))})} className="w-full bg-slate-50 p-3 text-2xl font-black text-[#1E2E4F] outline-none rounded-xl" />
+              </div>
+
+              {/* WASIYYAH (WILL) ADVANCED SECTION */}
+              <div className="pt-6 pb-2">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#D89F37] px-2">{t('will_wasiyyah')}</h3>
+              </div>
+
+              <div className="glass-card p-6 space-y-5 shadow-md bg-[#D89F37]/5 border-[#D89F37]/20">
+                 <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('wasiyyah_cash')} (₹)</label>
+                      <input type="number" value={detailedWill.cash || ''} onChange={e => setDetailedWill({...detailedWill, cash: Math.max(0, Number(e.target.value))})} className="w-full bg-white p-2 text-lg font-black text-[#1E2E4F] outline-none rounded-lg border border-slate-100" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('wasiyyah_land')} ({t(detailedAssets.land.unit)})</label>
+                      <input type="number" value={detailedWill.landArea || ''} onChange={e => setDetailedWill({...detailedWill, landArea: Math.max(0, Number(e.target.value))})} className="w-full bg-white p-2 text-lg font-black text-[#1E2E4F] outline-none rounded-lg border border-slate-100" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('wasiyyah_gold')} (g)</label>
+                        <input type="number" value={detailedWill.goldWeight || ''} onChange={e => setDetailedWill({...detailedWill, goldWeight: Math.max(0, Number(e.target.value))})} className="w-full bg-white p-2 text-lg font-black text-[#1E2E4F] outline-none rounded-lg border border-slate-100" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('wasiyyah_silver')} (g)</label>
+                        <input type="number" value={detailedWill.silverWeight || ''} onChange={e => setDetailedWill({...detailedWill, silverWeight: Math.max(0, Number(e.target.value))})} className="w-full bg-white p-2 text-lg font-black text-[#1E2E4F] outline-none rounded-lg border border-slate-100" />
+                      </div>
+                    </div>
+                 </div>
+              </div>
+            </>
+          )}
+
           {[
-            { label: t('total_assets'), key: 'totalAssets', icon: '💰' },
             { label: t('debts'), key: 'debts', icon: '📉' },
             { label: t('funeral_expenses'), key: 'funeral', icon: '🕯️' },
-            { label: t('will_wasiyyah'), key: 'will', icon: '📜' }
+            ...(!detailedAssets.enabled ? [{ label: t('will_wasiyyah'), key: 'will', icon: '📜' }] : [])
           ].map(f => (
             <div key={f.key} className="glass-card p-6 space-y-3 shadow-md">
               <div className="flex items-center gap-3">
@@ -372,14 +528,14 @@ const App: React.FC = () => {
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">{f.label}</label>
               </div>
               <div className="relative">
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300 ml-1">₹</span>
+                <span className={`absolute ${isRtl ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300 ${isRtl ? 'mr-1' : 'ml-1'}`}>₹</span>
                 <input 
                   type="number"
                   inputMode="numeric"
                   placeholder="0"
                   value={(estate as any)[f.key] || ''}
                   onChange={e => setEstate({...estate, [f.key]: Math.max(0, Number(e.target.value))})}
-                  className={`w-full bg-transparent border-b-2 border-slate-100 py-3 ${lang === 'ar' ? 'pr-8 pl-0' : 'pl-8'} text-2xl font-black text-[#1E2E4F] outline-none focus:border-[#006B46] transition-colors`}
+                  className={`w-full bg-transparent border-b-2 border-slate-100 py-3 ${isRtl ? 'pr-8 pl-0 text-right' : 'pl-8 text-left'} text-2xl font-black text-[#1E2E4F] outline-none focus:border-[#006B46] transition-colors`}
                 />
               </div>
             </div>
@@ -503,9 +659,30 @@ const App: React.FC = () => {
             </button>
           </div>
           <h2 className="text-3xl font-black text-[#1E2E4F] tracking-tight">{t('distribution_result')}</h2>
-          <div className="glass-navy p-8 text-white space-y-1 shadow-2xl">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">{t('net_estate')}</p>
-            <p className="text-4xl font-black text-[#D89F37]">₹{result.netEstate.toLocaleString()}</p>
+          <div className="space-y-4">
+            {/* Cash Available Display */}
+            <div className="glass-navy p-6 text-white space-y-1 shadow-2xl">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">{t('net_estate')}</p>
+              <p className="text-3xl font-black text-[#D89F37]">
+                {result.netEstate > 0 ? `₹${Math.floor(result.netEstate).toLocaleString()}` : '₹0'}
+              </p>
+            </div>
+            
+            {/* Land Available Display - Separated with Reference Value */}
+            {detailedAssets.enabled && result.totalLand > 0 && (
+              <div className="glass-card p-6 border-emerald-100 border-2 shadow-xl space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col text-left">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('land_available')}</p>
+                    <p className="text-2xl font-black text-[#006B46]">{result.totalLand.toFixed(2)} {t(detailedAssets.land.unit)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('ref_value')}</p>
+                    <p className="text-lg font-bold text-slate-500 italic">₹{(result.totalLand * detailedAssets.land.valuePerUnit).toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </header>
 
@@ -544,71 +721,64 @@ const App: React.FC = () => {
                 
                 <div className="h-px bg-slate-100/50 w-full" />
 
-                <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Share</p>
-                        <p className="text-sm font-black text-[#1E2E4F]">{s.fraction} <span className="text-[10px] opacity-40">({s.percentage})</span></p>
+                <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Ratio</p>
+                            <p className="text-sm font-black text-[#1E2E4F]">{s.fraction} <span className="text-[10px] opacity-40">({s.percentage})</span></p>
+                        </div>
                     </div>
-                    <div className={`${isRtl ? 'text-left' : 'text-right'} space-y-0.5`}>
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('per_person')}</p>
-                        <p className="text-2xl font-black text-[#006B46]">₹{Math.floor(s.amountEach).toLocaleString()}</p>
+
+                    <div className="space-y-3">
+                        {/* Cash Share */}
+                        {(result.netEstate > 0 || !detailedAssets.enabled) && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Cash (each)</span>
+                            <span className="text-xl font-black text-[#006B46]">₹{Math.floor(s.amountEach).toLocaleString()}</span>
+                          </div>
+                        )}
+
+                        {/* Land Share - Separate independent calculation display */}
+                        {detailedAssets.enabled && result.totalLand > 0 && (
+                          <div className="flex items-center justify-between pt-2 border-t border-slate-50">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm">📍</span>
+                              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Land (each)</span>
+                            </div>
+                            <span className="text-lg font-black text-[#006B46]">{s.landEach.toFixed(3)} {t(detailedAssets.land.unit)}</span>
+                          </div>
+                        )}
+
+                        {/* Gold/Silver Independent Shares */}
+                        {detailedAssets.enabled && (result.totalGold > 0 || result.totalSilver > 0) && (
+                          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-50">
+                             {result.totalGold > 0 && (
+                               <div className="flex flex-col">
+                                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Gold (each)</span>
+                                  <span className="text-sm font-black text-[#D89F37]">{s.goldEach.toFixed(3)}g</span>
+                               </div>
+                             )}
+                             {result.totalSilver > 0 && (
+                               <div className="flex flex-col text-right">
+                                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Silver (each)</span>
+                                  <span className="text-sm font-black text-slate-500">{s.silverEach.toFixed(3)}g</span>
+                               </div>
+                             )}
+                          </div>
+                        )}
                     </div>
                 </div>
               </div>
             ))}
+            
+            {detailedAssets.enabled && (
+               <div className="px-2 mt-4">
+                  <p className="text-[9px] text-slate-400 italic text-center font-medium leading-relaxed">
+                    {t('note_value_based')}
+                  </p>
+               </div>
+            )}
           </div>
         </div>
 
-        <div className="px-6 py-8 glass rounded-t-[40px] shadow-2xl shrink-0 pb-safe grid grid-cols-1 gap-4">
-          <button 
-            onClick={reset} 
-            className="w-full bg-[#1E2E4F] text-white py-5 rounded-2xl font-black text-xl active-press shadow-xl shadow-[#1E2E4F]/20"
-          >
-            {t('new_calculation')}
-          </button>
-        </div>
-
-        {/* QR Share Modal */}
-        {showQR && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in">
-            <div className="absolute inset-0 bg-[#1E2E4F]/80 backdrop-blur-md" onClick={() => setShowQR(false)}></div>
-            <div className="relative glass-card p-10 w-full max-w-sm flex flex-col items-center gap-8 shadow-2xl mx-auto">
-              <div className="text-center space-y-2">
-                <h3 className={`text-2xl font-black text-[#1E2E4F] ${isRtl ? 'arabic' : ''}`}>{t('qr_title')}</h3>
-                <p className={`text-slate-500 text-sm font-medium ${isRtl ? 'arabic' : ''}`}>{t('qr_desc')}</p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-[32px] shadow-inner border-4 border-slate-50">
-                <QRCodeCanvas 
-                  value={getShareSummary()} 
-                  size={200}
-                  level="M"
-                  includeMargin={false}
-                  imageSettings={{
-                    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23006B46'%3E%3Cpath d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.247 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'/%3E%3C/svg%3E",
-                    x: undefined,
-                    y: undefined,
-                    height: 30,
-                    width: 30,
-                    excavate: true,
-                  }}
-                />
-              </div>
-
-              <button 
-                onClick={() => setShowQR(false)}
-                className={`w-full bg-[#1E2E4F] text-white py-4 rounded-2xl font-bold text-lg active-press ${isRtl ? 'arabic' : ''}`}
-              >
-                {t('close')}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return null;
-};
-
-export default App;
+        <
