@@ -52,8 +52,15 @@
       display: none !important;
     }
 
-    /* Fixed Arabic Rendering */
+    /* Base Arabic Font Class */
     .arabic {
+      font-family: 'Noto Naskh Arabic', 'Amiri', serif;
+      direction: rtl;
+      unicode-bidi: isolate;
+    }
+
+    /* Specific Quranic/Hadith Text Style */
+    .arabic-display {
       font-family: 'Noto Naskh Arabic', 'Amiri', serif;
       direction: rtl !important;
       text-align: center !important;

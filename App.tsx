@@ -147,7 +147,6 @@ const App: React.FC = () => {
     }
 
     // 2. Validation: Estate Assets <= Liabilities
-    const totalLiabilities = estate.debts + estate.funeral + estate.will;
     if (estate.totalAssets <= (estate.debts + estate.funeral)) {
       setUiError(t('error_liabilities_exceed_assets'));
       return;
@@ -289,7 +288,7 @@ const App: React.FC = () => {
             <div className="absolute top-0 right-0 p-4 opacity-5">
               <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M13 14.725c0-5.141 3.892-10.519 10-10.519l.716 2.185c-3.136 1.054-5.136 3.054-5.136 5.484 0 1.656.804 2.185 1.512 2.185 1.275 0 2.374 1.108 2.374 2.538 0 1.532-1.22 2.538-2.625 2.538-2.146 0-6.841-1.603-6.841-6.411zm-13 0c0-5.141 3.892-10.519 10-10.519l.716 2.185c-3.136 1.054-5.136 3.054-5.136 5.484 0 1.656.804 2.185 1.512 2.185 1.275 0 2.374 1.108 2.374 2.538 0 1.532-1.22 2.538-2.625 2.538-2.146 0-6.841-1.603-6.841-6.411z"/></svg>
             </div>
-            <div className="arabic mb-8 text-center" dir="rtl">{t('hadith_arabic')}</div>
+            <div className="arabic-display mb-8 text-center" dir="rtl">{t('hadith_arabic')}</div>
             <p className="text-center text-[#1E2E4F] font-bold text-lg leading-relaxed">
               {t('hadith_translation')}
             </p>
@@ -308,7 +307,7 @@ const App: React.FC = () => {
              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
           </div>
           <div className="glass-card p-10 w-full shadow-xl">
-            <div className="arabic mb-8 text-center" dir="rtl">{t('ayah_arabic')}</div>
+            <div className="arabic-display mb-8 text-center" dir="rtl">{t('ayah_arabic')}</div>
             <p className="text-center text-[#1E2E4F] font-bold text-lg leading-relaxed">
               {t('ayah_translation')}
             </p>
@@ -437,7 +436,7 @@ const App: React.FC = () => {
                 <div key={type} className="flex flex-col">
                   <div className="flex items-center justify-between p-5 h-[80px]">
                     <div className="flex flex-col gap-0.5">
-                      <span className={`font-bold text-[#1E2E4F] tracking-tight ${lang === 'ar' ? 'text-lg' : ''}`}>
+                      <span className={`font-bold text-[#1E2E4F] tracking-tight ${lang === 'ar' ? 'arabic text-lg' : ''}`}>
                         {meta[lang]}
                       </span>
                     </div>
@@ -466,7 +465,7 @@ const App: React.FC = () => {
         </div>
 
         {uiError && (
-          <div className="mb-4 p-4 bg-rose-50 text-rose-700 rounded-2xl text-sm font-bold malayalam animate-in flex items-center gap-3 border border-rose-100">
+          <div className={`mb-4 p-4 bg-rose-50 text-rose-700 rounded-2xl text-sm font-bold animate-in flex items-center gap-3 border border-rose-100 ${lang === 'ar' ? 'arabic text-base' : lang === 'ml' ? 'malayalam' : ''}`}>
             <span className="text-lg">⚠️</span> {uiError}
           </div>
         )}
@@ -526,7 +525,7 @@ const App: React.FC = () => {
           </div>
 
           {result.warnings.length > 0 && result.warnings.map((w, i) => (
-             <div key={i} className="bg-amber-50/70 border border-amber-100 p-5 rounded-2xl text-amber-800 text-[13px] font-bold flex gap-3 shadow-sm animate-in backdrop-blur-sm">
+             <div key={i} className={`p-5 rounded-2xl text-[13px] font-bold flex gap-3 shadow-sm animate-in backdrop-blur-sm bg-amber-50/70 border border-amber-100 text-amber-800 ${isRtl ? 'arabic text-base' : ''}`}>
                <span className="text-lg">⚠️</span> {t(w)}
              </div>
           ))}
@@ -537,7 +536,7 @@ const App: React.FC = () => {
               <div key={i} className={`glass-card p-6 flex flex-col gap-4 border-${isRtl ? 'r' : 'l'}-8 border-${isRtl ? 'r' : 'l'}-[#006B46] animate-in shadow-md hover:scale-[1.01] transition-all`}>
                 <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                        <p className="font-black text-[#1E2E4F] text-lg leading-tight">{s.label}</p>
+                        <p className={`font-black text-[#1E2E4F] text-lg leading-tight ${isRtl ? 'arabic' : ''}`}>{s.label}</p>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{s.type === 'Excluded' ? t('excluded') : s.type} • {s.symbol}</p>
                     </div>
                     <div className="bg-white/60 px-3 py-1.5 rounded-xl text-[10px] font-black text-slate-500 border border-slate-100">{s.count} {t('each')}</div>
@@ -575,8 +574,8 @@ const App: React.FC = () => {
             <div className="absolute inset-0 bg-[#1E2E4F]/80 backdrop-blur-md" onClick={() => setShowQR(false)}></div>
             <div className="relative glass-card p-10 w-full max-w-sm flex flex-col items-center gap-8 shadow-2xl mx-auto">
               <div className="text-center space-y-2">
-                <h3 className="text-2xl font-black text-[#1E2E4F]">{t('qr_title')}</h3>
-                <p className="text-slate-500 text-sm font-medium">{t('qr_desc')}</p>
+                <h3 className={`text-2xl font-black text-[#1E2E4F] ${isRtl ? 'arabic' : ''}`}>{t('qr_title')}</h3>
+                <p className={`text-slate-500 text-sm font-medium ${isRtl ? 'arabic' : ''}`}>{t('qr_desc')}</p>
               </div>
               
               <div className="bg-white p-6 rounded-[32px] shadow-inner border-4 border-slate-50">
@@ -598,7 +597,7 @@ const App: React.FC = () => {
 
               <button 
                 onClick={() => setShowQR(false)}
-                className="w-full bg-[#1E2E4F] text-white py-4 rounded-2xl font-bold text-lg active-press"
+                className={`w-full bg-[#1E2E4F] text-white py-4 rounded-2xl font-bold text-lg active-press ${isRtl ? 'arabic' : ''}`}
               >
                 {t('close')}
               </button>
