@@ -7,7 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- High-quality professional font stack -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Sans+Tamil:wght@300;400;500;600;700;800&family=Noto+Sans+Malayalam:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #006B46;
@@ -23,15 +24,17 @@
       width: 100%;
       overflow: hidden !important;
       position: fixed;
-      font-family: 'Plus Jakarta Sans', 'Noto Sans Malayalam', sans-serif;
+      /* Optimized UI font stack */
+      font-family: 'Plus Jakarta Sans', 'IBM Plex Sans Arabic', 'Noto Sans Malayalam', 'Noto Sans Tamil', sans-serif;
       background-color: var(--bg);
       color: #0f172a;
       -webkit-tap-highlight-color: transparent;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
+      font-feature-settings: "kern" 1;
     }
 
-    /* Elegant Pattern */
+    /* Elegant Islamic Geometric Pattern */
     body::before {
       content: "";
       position: absolute;
@@ -39,7 +42,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0l25 25-25 25-25-25zM0 50l25 25-25 25-25-25zM100 50l25 25-25 25-25-25zM50 100l25 25-25 25-25-25z' fill='%23006b46' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0l20 20-20 20-20-20zM0 40l20 20-20 20-20-20zM80 40l20 20-20 20-20-20zM40 80l20 20-20 20-20-20z' fill='%23006b46' fill-opacity='0.025' fill-rule='evenodd'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
     }
@@ -52,57 +55,71 @@
       display: none !important;
     }
 
-    /* Base Arabic Font Class */
+    /* Modern Arabic UI Style */
     .arabic {
-      font-family: 'Noto Naskh Arabic', 'Amiri', serif;
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
       direction: rtl;
       unicode-bidi: isolate;
+      line-height: 1.6;
+      font-size: 1.05em; /* Optical scaling for Arabic */
     }
 
-    /* Specific Quranic/Hadith Text Style */
+    /* Classical Arabic Display Text (Quran/Hadith) */
     .arabic-display {
-      font-family: 'Noto Naskh Arabic', 'Amiri', serif;
+      font-family: 'Scheherazade New', 'Amiri', serif;
       direction: rtl !important;
       text-align: center !important;
-      font-size: 26px !important;
-      line-height: 1.8 !important;
-      font-weight: 600 !important;
+      font-size: 2.25rem !important; /* Larger and distinct */
+      line-height: 2.2 !important; /* High vertical rhythm for harakat */
+      font-weight: 500 !important;
       unicode-bidi: isolate;
       color: var(--secondary);
+      /* Professional typographic ligatures and tashkeel support */
+      font-feature-settings: "liga" 1, "dlig" 1, "kern" 1;
+      word-wrap: normal;
+      overflow-wrap: normal;
+      white-space: normal;
+      text-rendering: optimizeLegibility;
     }
     
     .malayalam {
       font-family: 'Noto Sans Malayalam', sans-serif;
       letter-spacing: -0.01em;
+      line-height: 1.7;
+      font-size: 0.95em;
+    }
+
+    .tamil {
+      font-family: 'Noto Sans Tamil', sans-serif;
       line-height: 1.6;
     }
 
     .glass {
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.75);
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border-top: 1px solid rgba(255, 255, 255, 0.4);
+      border-top: 1px solid rgba(255, 255, 255, 0.45);
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.6);
       border-radius: 28px;
     }
 
     .glass-navy {
-      background: linear-gradient(135deg, rgba(30, 46, 79, 0.95), rgba(30, 46, 79, 0.85));
+      background: linear-gradient(135deg, rgba(30, 46, 79, 0.98), rgba(30, 46, 79, 0.88));
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 32px;
     }
 
     .active-press:active {
-      transform: scale(0.96);
-      transition: transform 0.1s ease;
+      transform: scale(0.97);
+      transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .scroll-container {
@@ -111,31 +128,38 @@
       overscroll-behavior: contain;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .animate-in {
-      animation: fadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation: fadeInScale 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
 
     /* Safe Area Padding Utilities */
     .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     .pt-safe { padding-top: env(safe-area-inset-top); }
+    
+    /* Input aesthetics */
+    input::placeholder {
+      color: rgba(30, 46, 79, 0.2);
+    }
   </style>
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "qrcode.react": "https://esm.sh/qrcode.react@^3.1.0"
+    "react": "https://esm.sh/react@19.0.0",
+    "react/": "https://esm.sh/react@19.0.0/",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/": "https://esm.sh/react-dom@19.0.0/",
+    "@google/genai": "https://esm.sh/@google/genai@1.35.0"
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body class="antialiased">
   <div id="root" class="h-full w-full relative z-10 overflow-hidden"></div>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>
