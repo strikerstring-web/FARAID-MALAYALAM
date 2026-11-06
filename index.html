@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="ml">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Farāid Calculator | ഫറാഇദ് കാൽക്കുലേറ്റർ</title>
+  <title>Farāid Calculator | Islamic Estate Distribution</title>
+  <meta name="description" content="A professional Islamic inheritance calculator for Sharia-compliant estate distribution.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- High-quality professional font stack -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Sans+Tamil:wght@300;400;500;600;700;800&family=Noto+Sans+Malayalam:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- High-fidelity Arabic, Malayalam, Tamil and Latin Typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=Alexandria:wght@300;400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@300;400;500;600;700;800&family=Noto+Sans+Tamil:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #006B46;
@@ -24,17 +25,17 @@
       width: 100%;
       overflow: hidden !important;
       position: fixed;
-      /* Optimized UI font stack */
       font-family: 'Plus Jakarta Sans', 'IBM Plex Sans Arabic', 'Noto Sans Malayalam', 'Noto Sans Tamil', sans-serif;
       background-color: var(--bg);
       color: #0f172a;
       -webkit-tap-highlight-color: transparent;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       font-feature-settings: "kern" 1;
     }
 
-    /* Elegant Islamic Geometric Pattern */
+    /* Subtle Islamic Geometric Pattern */
     body::before {
       content: "";
       position: absolute;
@@ -55,66 +56,74 @@
       display: none !important;
     }
 
-    /* Modern Arabic UI Style */
+    /* Professional Arabic UI Typography */
     .arabic {
-      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      font-family: 'IBM Plex Sans Arabic', 'Alexandria', sans-serif !important;
       direction: rtl;
-      unicode-bidi: isolate;
-      line-height: 1.6;
-      font-size: 1.05em; /* Optical scaling for Arabic */
+      text-align: right;
+      letter-spacing: normal !important;
+      word-spacing: normal !important;
+      line-height: 1.7;
+      font-feature-settings: "liga" 1, "calt" 1;
     }
 
-    /* Classical Arabic Display Text (Quran/Hadith) */
+    /* Classical Arabic Display Text (Quranic Ayahs & Hadiths with Tashkeel) */
     .arabic-display {
-      font-family: 'Scheherazade New', 'Amiri', serif;
+      font-family: 'Amiri', 'Scheherazade New', serif !important;
       direction: rtl !important;
       text-align: center !important;
-      font-size: 2.25rem !important; /* Larger and distinct */
-      line-height: 2.2 !important; /* High vertical rhythm for harakat */
-      font-weight: 500 !important;
-      unicode-bidi: isolate;
+      font-size: clamp(1.25rem, 4.2vw, 1.75rem) !important;
+      line-height: 2.2 !important;
+      font-weight: 600 !important;
       color: var(--secondary);
-      /* Professional typographic ligatures and tashkeel support */
-      font-feature-settings: "liga" 1, "dlig" 1, "kern" 1;
-      word-wrap: normal;
-      overflow-wrap: normal;
-      white-space: normal;
+      font-feature-settings: "liga" 1, "calt" 1, "mkmk" 1, "mark" 1;
+      padding: 0.25rem 0;
+      word-break: normal;
+      overflow-wrap: break-word;
       text-rendering: optimizeLegibility;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .malayalam {
-      font-family: 'Noto Sans Malayalam', sans-serif;
+      font-family: 'Noto Sans Malayalam', sans-serif !important;
       letter-spacing: -0.01em;
-      line-height: 1.7;
-      font-size: 0.95em;
+      line-height: 1.65;
     }
 
     .tamil {
-      font-family: 'Noto Sans Tamil', sans-serif;
+      font-family: 'Noto Sans Tamil', sans-serif !important;
       line-height: 1.6;
     }
 
+    /* Numerical and BiDi isolation to prevent inverted numbers, fractions, and currencies in RTL */
+    .bdi-num {
+      direction: ltr !important;
+      unicode-bidi: isolate !important;
+      display: inline-block;
+    }
+
     .glass {
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border-top: 1px solid rgba(255, 255, 255, 0.45);
+      border-top: 1px solid rgba(255, 255, 255, 0.5);
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 24px;
     }
 
     .glass-navy {
-      background: linear-gradient(135deg, rgba(30, 46, 79, 0.98), rgba(30, 46, 79, 0.88));
+      background: linear-gradient(135deg, rgba(30, 46, 79, 0.98), rgba(24, 37, 63, 0.95));
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 32px;
+      border-radius: 28px;
     }
 
     .active-press:active {
@@ -129,20 +138,19 @@
     }
 
     @keyframes fadeInScale {
-      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .animate-in {
-      animation: fadeInScale 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      animation: fadeInScale 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
 
     /* Safe Area Padding Utilities */
     .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     .pt-safe { padding-top: env(safe-area-inset-top); }
     
-    /* Input aesthetics */
     input::placeholder {
-      color: rgba(30, 46, 79, 0.2);
+      color: rgba(30, 46, 79, 0.25);
     }
   </style>
 <script type="importmap">
