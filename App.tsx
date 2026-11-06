@@ -28,19 +28,31 @@ const stepsOrder = [
   AppStep.RESULT
 ];
 
-const ScreenWrapper: React.FC<ScreenWrapperProps> = ({ children, currentStep, nextStep, prevStep, setStep, nextLabel, disabled = false, hideFooter = false, lang }) => {
+const ScreenWrapper: React.FC<ScreenWrapperProps> = ({ 
+  children, 
+  currentStep, 
+  nextStep, 
+  prevStep, 
+  setStep, 
+  nextLabel, 
+  disabled = false, 
+  hideFooter = false, 
+  lang 
+}) => {
   const stepIndex = stepsOrder.indexOf(currentStep);
   const t = (key: string) => (translations[lang] as any)?.[key] || key;
   const isRtl = lang === 'ar';
-  const langClass = lang === 'ar' ? 'arabic' : lang === 'ml' ? 'malayalam' : lang === 'ta' ? 'tamil' : '';
+  const isAr = lang === 'ar';
+  const langClass = isAr ? 'arabic' : lang === 'ml' ? 'malayalam' : lang === 'ta' ? 'tamil' : '';
 
   return (
     <div className={`h-full flex flex-col relative overflow-hidden bg-transparent pt-safe ${langClass}`} dir={isRtl ? 'rtl' : 'ltr'}>
+      {/* Top Heritage Progress Bar */}
       <div className="shrink-0 z-[70]">
         {stepIndex >= 1 && (
-          <div className="h-1.5 bg-slate-200/50 w-full relative">
+          <div className="h-1 bg-emerald-950/10 w-full relative overflow-hidden">
             <div 
-              className="h-full bg-[#D89F37] transition-all duration-700 ease-in-out shadow-[0_0_8px_rgba(216,159,55,0.4)]" 
+              className="h-full bg-gradient-to-r from-[#0A6A4C] via-[#1AA073] to-[#C89B3C] transition-all duration-700 ease-out shadow-[0_0_10px_rgba(200,155,60,0.4)]" 
               style={{ 
                 width: `${((stepIndex) / (stepsOrder.length - 1)) * 100}%`, 
                 [isRtl ? 'right' : 'left']: 0,
@@ -50,25 +62,34 @@ const ScreenWrapper: React.FC<ScreenWrapperProps> = ({ children, currentStep, ne
           </div>
         )}
       </div>
-      <main className="flex-1 min-h-0 relative z-10 flex flex-col max-w-md mx-auto w-full px-5 overflow-hidden">{children}</main>
+
+      <main className="flex-1 min-h-0 relative z-10 flex flex-col max-w-lg md:max-w-xl mx-auto w-full px-5 overflow-hidden">
+        {children}
+      </main>
+
       {!hideFooter && (
-        <div className="px-6 py-5 glass flex justify-center gap-4 shrink-0 rounded-t-[32px] shadow-[0_-8px_30px_rgba(0,0,0,0.05)] pb-safe">
+        <div className="px-6 py-4 glass-nav flex justify-center items-center gap-3 shrink-0 rounded-t-[32px] pb-safe z-50">
           {prevStep && (
             <button 
               onClick={() => setStep(prevStep)} 
               aria-label={t('back')}
-              className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white border border-slate-200 text-[#1E2E4F] active-press transition-all shadow-sm shrink-0"
+              className="w-13 h-13 rounded-2xl flex items-center justify-center bg-white border border-[#0A6A4C]/15 text-[#0A1C18] hover:bg-[#0A6A4C]/5 active-press transition-all shadow-sm shrink-0"
             >
-              <svg className={`w-6 h-6 ${isRtl ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+              <svg className={`w-5 h-5 ${isRtl ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
           )}
           {nextStep && (
             <button 
               disabled={disabled} 
               onClick={() => setStep(nextStep)} 
-              className="flex-1 h-14 bg-[#006B46] text-white rounded-2xl font-bold text-lg transition-all active-press shadow-lg shadow-[#006B46]/20 disabled:opacity-40"
+              className="flex-1 h-13 bg-gradient-to-r from-[#0A6A4C] to-[#08583E] text-white rounded-2xl font-bold text-base sm:text-lg transition-all active-press shadow-lg shadow-[#0A6A4C]/25 hover:shadow-xl hover:shadow-[#0A6A4C]/35 disabled:opacity-40 border border-[#C89B3C]/30 flex items-center justify-center gap-2"
             >
-              {nextLabel || t('continue')}
+              <span>{nextLabel || t('continue')}</span>
+              <svg className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           )}
         </div>
@@ -103,7 +124,6 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Synchronize HTML element language and direction
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, [lang]);
@@ -203,27 +223,39 @@ const App: React.FC = () => {
   // STEP 0: LANGUAGE SELECTION
   if (step === AppStep.LANGUAGE_SELECT) {
     return (
-      <div className="h-full bg-[#1E2E4F] flex flex-col items-center justify-center p-8 space-y-10 overflow-hidden text-center">
-        <div className="space-y-3">
-          <h1 className="text-3xl font-black text-white tracking-tight">Select Language</h1>
-          <h1 className="text-2xl font-black text-white/80 malayalam">ഭാഷ തിരഞ്ഞെടുക്കുക</h1>
-          <h1 className="text-2xl font-black text-white/80 tamil">மொழியைத் தேர்ந்தெடுக்கவும்</h1>
-          <h1 className="text-2xl font-black text-white/90 arabic" dir="rtl">اختر لغة التطبيق</h1>
+      <div className="h-full bg-gradient-to-b from-[#091B17] via-[#0D2420] to-[#061411] flex flex-col items-center justify-center p-8 space-y-9 overflow-hidden text-center relative">
+        {/* Decorative Golden Ambient Glows */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#C89B3C]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 right-10 w-64 h-64 bg-[#0A6A4C]/15 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Central Archival Medallion */}
+        <div className="relative z-10 space-y-3">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#C89B3C]/20 to-[#0A6A4C]/30 border border-[#C89B3C]/40 flex items-center justify-center mx-auto shadow-[0_0_24px_rgba(200,155,60,0.2)]">
+            <svg className="w-8 h-8 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <div className="space-y-1">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-serif">Select Language</h1>
+            <p className="text-sm font-medium text-[#C89B3C] arabic" dir="rtl">اختر لغة التطبيق الشرعي</p>
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 w-full max-w-sm mx-auto">
+
+        {/* Language Options Grid */}
+        <div className="grid grid-cols-2 gap-3.5 w-full max-w-sm mx-auto relative z-10">
           {[
-            { id: 'en', l: 'English', c: '' }, 
-            { id: 'ml', l: 'മലയാളം', c: 'malayalam' }, 
-            { id: 'ta', l: 'தமிழ்', c: 'tamil' }, 
-            { id: 'ar', l: 'العربية', c: 'arabic' }
+            { id: 'en', l: 'English', sub: 'Latin', c: '' }, 
+            { id: 'ml', l: 'മലയാളം', sub: 'Malayalam', c: 'malayalam' }, 
+            { id: 'ta', l: 'தமிழ்', sub: 'Tamil', c: 'tamil' }, 
+            { id: 'ar', l: 'العربية', sub: 'Arabic', c: 'arabic' }
           ].map(x => (
             <button 
               key={x.id} 
               onClick={() => handleLangSelect(x.id as Language)} 
-              className={`glass-card p-6 flex flex-col items-center justify-center gap-2 border-white/20 hover:bg-white/20 transition-all active-press ${x.c}`}
+              className={`p-5 rounded-2xl flex flex-col items-center justify-center gap-1.5 bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 hover:border-[#C89B3C]/60 transition-all active-press shadow-lg backdrop-blur-md group ${x.c}`}
             >
-              <span className="text-white font-bold text-xl">{x.l}</span>
-              <span className="text-white/40 text-[10px] uppercase tracking-widest">{x.id}</span>
+              <span className="text-white font-bold text-lg group-hover:text-[#F4D37A] transition-colors">{x.l}</span>
+              <span className="text-white/40 text-[10px] uppercase tracking-widest">{x.sub}</span>
             </button>
           ))}
         </div>
@@ -231,29 +263,49 @@ const App: React.FC = () => {
     );
   }
 
-  // STEP 1: WELCOME
+  // STEP 1: WELCOME SCREEN
   if (step === AppStep.WELCOME) {
     return (
-      <div className={`h-full bg-[#1E2E4F] flex flex-col items-center justify-center p-10 text-white text-center relative overflow-hidden ${langClass}`} dir={isRtl ? 'rtl' : 'ltr'}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#006B46]/20 rounded-full -mr-32 -mt-32 blur-3xl pointer-events-none" />
-        <div className="relative z-10 animate-in space-y-10 w-full">
-          <div className="w-28 h-28 bg-white/10 backdrop-blur-xl rounded-[36px] flex items-center justify-center mx-auto shadow-2xl border border-white/20">
-            <svg className="w-14 h-14 text-[#D89F37]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.247 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+      <div className={`h-full bg-gradient-to-b from-[#091B17] via-[#0D2420] to-[#071411] flex flex-col items-center justify-center p-8 sm:p-10 text-white text-center relative overflow-hidden ${langClass}`} dir={isRtl ? 'rtl' : 'ltr'}>
+        {/* Soft Ambient Radiance */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#0A6A4C]/20 rounded-full blur-[90px] pointer-events-none" />
+        <div className="absolute top-10 right-0 w-64 h-64 bg-[#C89B3C]/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 animate-elevate space-y-8 w-full max-w-sm">
+          {/* Ornate Islamic Seal Medallion */}
+          <div className="relative mx-auto w-28 h-28 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-[#0A6A4C] to-[#C89B3C] opacity-30 blur-xl animate-pulse" />
+            <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-b from-white/10 to-white/[0.02] backdrop-blur-2xl border border-[#C89B3C]/40 flex items-center justify-center shadow-2xl">
+              <svg className="w-12 h-12 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.247 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
           </div>
-          <div className="space-y-4">
-            <h1 className={`text-4xl font-extrabold tracking-tight text-white drop-shadow-md ${isAr ? 'text-4xl' : ''}`}>{t('app_title')}</h1>
-            <p className="text-slate-300 text-base sm:text-lg opacity-85 font-medium leading-relaxed max-w-sm mx-auto">{t('app_subtitle')}</p>
+
+          {/* Titles */}
+          <div className="space-y-3">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white drop-shadow-md">
+              {t('app_title')}
+            </h1>
+            <p className="text-slate-300 text-sm sm:text-base font-normal leading-relaxed opacity-90 max-w-xs mx-auto">
+              {t('app_subtitle')}
+            </p>
           </div>
-          <div className="flex flex-col gap-4 max-w-xs mx-auto w-full pt-2">
+
+          {/* Actions */}
+          <div className="flex flex-col gap-3.5 pt-2">
             <button 
               onClick={() => setStep(AppStep.DESCRIPTION)} 
-              className="w-full bg-[#006B46] text-white py-4 rounded-2xl font-bold text-xl active-press shadow-2xl hover:bg-[#007a50] transition-colors"
+              className="w-full bg-gradient-to-r from-[#0A6A4C] to-[#0C7A58] hover:from-[#0C7A58] hover:to-[#0A6A4C] text-white py-4 rounded-2xl font-bold text-lg active-press shadow-xl shadow-[#0A6A4C]/30 border border-[#C89B3C]/40 transition-all flex items-center justify-center gap-2"
             >
-              {t('start')}
+              <span>{t('start')}</span>
+              <svg className={`w-5 h-5 ${isRtl ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M14 5l7 7-7 7M3 12h18" />
+              </svg>
             </button>
             <button 
               onClick={() => setStep(AppStep.LANGUAGE_SELECT)} 
-              className="text-white/50 hover:text-white/80 text-xs font-bold uppercase tracking-widest underline transition-colors"
+              className="text-[#C89B3C] hover:text-[#F4D37A] text-xs font-semibold uppercase tracking-widest transition-colors py-1"
             >
               {t('change_language')}
             </button>
@@ -267,11 +319,14 @@ const App: React.FC = () => {
   if (step === AppStep.DESCRIPTION) {
     return (
       <ScreenWrapper lang={lang} currentStep={step} nextStep={AppStep.HADITH} prevStep={AppStep.WELCOME} setStep={setStep}>
-        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar py-8 space-y-6 animate-in">
-          <h2 className={`text-3xl font-black text-[#1E2E4F] text-center ${isAr ? 'text-3xl' : ''}`}>{t('what_is_faraid')}</h2>
-          <div className="glass-card p-7 space-y-6 text-slate-700 text-base sm:text-lg leading-relaxed shadow-lg">
+        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar py-7 space-y-6 animate-elevate">
+          <div className="text-center space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#0A6A4C]">{t('rules_subtitle')}</span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D19]">{t('what_is_faraid')}</h2>
+          </div>
+          <div className="silk-card p-6 sm:p-7 space-y-5 text-slate-700 text-sm sm:text-base leading-relaxed">
             <p>{t('faraid_desc_1')}</p>
-            <div className="h-px bg-slate-200/60" />
+            <div className="h-px bg-[#0A6A4C]/10" />
             <p>{t('faraid_desc_2')}</p>
           </div>
         </div>
@@ -290,26 +345,29 @@ const App: React.FC = () => {
         prevStep={isHadith ? AppStep.DESCRIPTION : AppStep.HADITH} 
         setStep={setStep}
       >
-        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar py-6 flex flex-col justify-center animate-in space-y-6">
-          <div className="glass-card p-6 sm:p-8 w-full shadow-xl space-y-6 border border-emerald-900/10">
+        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar py-6 flex flex-col justify-center animate-elevate space-y-6">
+          <div className="silk-card p-6 sm:p-8 w-full space-y-6 border border-[#C89B3C]/25 shadow-lg relative overflow-hidden">
+            {/* Corner Ornamental Flourish */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#C89B3C]/10 to-transparent pointer-events-none" />
+
             <div className="text-center">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#006B46] bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+              <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#0A6A4C] bg-emerald-50 px-3.5 py-1 rounded-full border border-[#0A6A4C]/15">
                 {t(isHadith ? 'hadith_title' : 'ayah_title')}
               </span>
             </div>
             
-            {/* Arabic display text with complete tashkeel and responsive typography */}
+            {/* Calligraphic Quranic / Hadith Text with Tashkeel */}
             <div className="arabic-display" dir="rtl">
               {t(isHadith ? 'hadith_arabic' : 'ayah_arabic')}
             </div>
 
-            <div className="h-px bg-slate-200/60 w-3/4 mx-auto" />
+            <div className="h-px bg-[#C89B3C]/20 w-2/3 mx-auto" />
 
-            <p className="text-center text-[#1E2E4F] font-bold text-base sm:text-lg leading-relaxed px-2">
+            <p className="text-center text-[#0B1D19] font-medium text-sm sm:text-base leading-relaxed px-2">
               {t(isHadith ? 'hadith_translation' : 'ayah_translation')}
             </p>
 
-            <p className="text-center text-slate-400 font-extrabold text-xs tracking-widest uppercase">
+            <p className="text-center text-[#C89B3C] font-black text-xs tracking-widest uppercase">
               {t(isHadith ? 'hadith_ref' : 'ayah_ref')}
             </p>
           </div>
@@ -323,14 +381,23 @@ const App: React.FC = () => {
     return (
       <ScreenWrapper lang={lang} currentStep={step} nextStep={AppStep.ASSETS} prevStep={AppStep.AYAH} setStep={setStep}>
         <header className="shrink-0 py-5 text-center space-y-1">
-          <h2 className="text-3xl font-black text-[#1E2E4F]">{t('rules_title')}</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D19]">{t('rules_title')}</h2>
           <p className="text-xs text-slate-500 font-medium">{t('rules_subtitle')}</p>
         </header>
-        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar space-y-4 pb-6">
-          {['fixed_shares', 'asabah', 'hijb'].map(k => (
-            <div key={k} className="glass-card p-5 space-y-2 shadow-md border-l-4 rtl:border-l-0 rtl:border-r-4 border-[#006B46]">
-              <h3 className="font-black text-[#1E2E4F] text-lg">{t(`${k}_title`)}</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{t(`${k}_desc`)}</p>
+        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar space-y-3.5 pb-6">
+          {[
+            { k: 'fixed_shares', num: '01' },
+            { k: 'asabah', num: '02' },
+            { k: 'hijb', num: '03' }
+          ].map(item => (
+            <div key={item.k} className="silk-card p-5 space-y-2 border border-[#0A6A4C]/15">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-black text-[#C89B3C] bg-amber-50 px-2 py-0.5 rounded-md border border-[#C89B3C]/20 bdi-num">
+                  {item.num}
+                </span>
+                <h3 className="font-bold text-[#0B1D19] text-base">{t(`${item.k}_title`)}</h3>
+              </div>
+              <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{t(`${item.k}_desc`)}</p>
             </div>
           ))}
         </div>
@@ -342,35 +409,42 @@ const App: React.FC = () => {
   if (step === AppStep.ASSETS) {
     return (
       <ScreenWrapper lang={lang} currentStep={step} nextStep={AppStep.GENDER} prevStep={AppStep.RULES} setStep={setStep}>
-        <header className="shrink-0 py-4 text-center space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-[#1E2E4F]">{t('estate_info')}</h2>
-          <div className="flex justify-center gap-2">
+        <header className="shrink-0 py-3 text-center space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D19]">{t('estate_info')}</h2>
+          
+          {/* Segmented Mode Switcher */}
+          <div className="inline-flex p-1 rounded-2xl bg-slate-200/70 border border-slate-300/40">
             <button 
               type="button"
               onClick={() => setDetailedAssets({...detailedAssets, enabled: false})} 
-              className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all ${!detailedAssets.enabled ? 'bg-[#1E2E4F] text-white shadow-md' : 'bg-slate-200/80 text-slate-600'}`}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${!detailedAssets.enabled ? 'bg-white text-[#0A6A4C] shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
             >
               {t('simple_assets')}
             </button>
             <button 
               type="button"
               onClick={() => setDetailedAssets({...detailedAssets, enabled: true})} 
-              className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all ${detailedAssets.enabled ? 'bg-[#006B46] text-white shadow-md' : 'bg-slate-200/80 text-slate-600'}`}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${detailedAssets.enabled ? 'bg-white text-[#0A6A4C] shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
             >
               {t('advanced_assets')}
             </button>
           </div>
 
-          {/* Live Total Gross Value Banner */}
-          <div className="glass-navy p-3 text-white rounded-2xl flex items-center justify-between px-4 shadow-sm">
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">{t('total_gross_assets')}</span>
-            <span className="text-lg font-black text-[#D89F37] bdi-num">₹{Math.round(currentGrossTotal).toLocaleString()}</span>
+          {/* Real-time Asset Valuation Banner */}
+          <div className="royal-card p-3.5 text-white flex items-center justify-between px-4">
+            <div className="text-left rtl:text-right">
+              <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider block">{t('total_gross_assets')}</span>
+              <span className="text-xs text-slate-400">Total Asset</span>
+            </div>
+            <span className="text-xl sm:text-2xl font-black text-[#D4AF37] bdi-num">
+              ₹{Math.round(currentGrossTotal).toLocaleString()}
+            </span>
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar space-y-4 pb-8">
+        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar space-y-3.5 pb-8">
           {!detailedAssets.enabled ? (
-            <div className="glass-card p-5 space-y-2 shadow-md">
+            <div className="silk-card p-5 space-y-2">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">{t('total_assets')}</label>
               <div className="relative flex items-center">
                 <span className={`absolute ${isRtl ? 'right-0 mr-1' : 'left-0 ml-1'} text-2xl font-black text-slate-400 pointer-events-none`}>₹</span>
@@ -380,22 +454,22 @@ const App: React.FC = () => {
                   value={estate.totalAssets || ''} 
                   onChange={e => setEstate({...estate, totalAssets: Math.max(0, Number(e.target.value))})} 
                   placeholder="0"
-                  className={`w-full bg-transparent border-b-2 border-slate-200 py-3 ${isRtl ? 'pr-8 text-right' : 'pl-8 text-left'} text-2xl font-black text-[#1E2E4F] outline-none focus:border-[#006B46] transition-colors`} 
+                  className={`w-full bg-transparent border-b-2 border-slate-200 py-3 ${isRtl ? 'pr-8 text-right' : 'pl-8 text-left'} text-2xl font-black text-[#0B1D19] outline-none focus:border-[#0A6A4C] transition-colors`} 
                 />
               </div>
             </div>
           ) : (
             <>
               {/* Land Section */}
-              <div className="glass-card p-5 space-y-3 shadow-md bg-white/70 border-l-4 rtl:border-l-0 rtl:border-r-4 border-[#006B46]">
+              <div className="silk-card p-4 sm:p-5 space-y-3 border-emerald-900/10">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-black uppercase text-[#006B46] tracking-wider flex items-center gap-1.5">
+                  <h3 className="text-xs font-black uppercase text-[#0A6A4C] tracking-wider flex items-center gap-1.5">
                     <span>🏘️</span> {t('land_details')}
                   </h3>
                   <select 
                     value={detailedAssets.land.unit} 
                     onChange={e => setDetailedAssets({ ...detailedAssets, land: { ...detailedAssets.land, unit: e.target.value as LandUnit } })}
-                    className="bg-slate-100 text-[#1E2E4F] text-xs font-black px-2.5 py-1 rounded-lg outline-none border border-slate-200 cursor-pointer"
+                    className="bg-emerald-50 text-[#0A6A4C] text-xs font-bold px-2.5 py-1 rounded-lg outline-none border border-emerald-200/60 cursor-pointer"
                   >
                     {(['acre', 'cent', 'sqft', 'sqm'] as LandUnit[]).map(u => <option key={u} value={u}>{t(u)}</option>)}
                   </select>
@@ -410,7 +484,7 @@ const App: React.FC = () => {
                       placeholder="0"
                       value={detailedAssets.land.area || ''} 
                       onChange={e => setDetailedAssets({...detailedAssets, land: {...detailedAssets.land, area: Math.max(0, Number(e.target.value))}})} 
-                      className="w-full bg-slate-50 p-2.5 text-lg font-black text-[#1E2E4F] rounded-lg border border-slate-200 focus:border-[#006B46] outline-none" 
+                      className="w-full bg-slate-50/80 p-2 text-base font-black text-[#0B1D19] rounded-lg border border-slate-200 focus:border-[#0A6A4C] outline-none" 
                     />
                   </div>
                   <div className="space-y-1">
@@ -421,26 +495,26 @@ const App: React.FC = () => {
                       placeholder="0"
                       value={detailedAssets.land.valuePerUnit || ''} 
                       onChange={e => setDetailedAssets({...detailedAssets, land: {...detailedAssets.land, valuePerUnit: Math.max(0, Number(e.target.value))}})} 
-                      className="w-full bg-slate-50 p-2.5 text-lg font-black text-[#1E2E4F] rounded-lg border border-slate-200 focus:border-[#006B46] outline-none" 
+                      className="w-full bg-slate-50/80 p-2 text-base font-black text-[#0B1D19] rounded-lg border border-slate-200 focus:border-[#0A6A4C] outline-none" 
                     />
                   </div>
                 </div>
-                <div className="flex justify-between items-center pt-1 text-xs">
-                  <span className="text-slate-400 font-medium">{t('value')}:</span>
-                  <span className="font-black text-[#006B46] bdi-num">₹{Math.round((detailedAssets.land.area || 0) * (detailedAssets.land.valuePerUnit || 0)).toLocaleString()}</span>
+                <div className="flex justify-between items-center pt-1 text-xs text-slate-500 border-t border-slate-100">
+                  <span>{t('value')}:</span>
+                  <span className="font-black text-[#0A6A4C] bdi-num">₹{Math.round((detailedAssets.land.area || 0) * (detailedAssets.land.valuePerUnit || 0)).toLocaleString()}</span>
                 </div>
               </div>
 
               {/* Gold Section */}
-              <div className="glass-card p-5 space-y-3 bg-white/70 shadow-md border-l-4 rtl:border-l-0 rtl:border-r-4 border-[#D89F37]">
+              <div className="silk-card p-4 sm:p-5 space-y-3 border-amber-900/10">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-black uppercase text-[#D89F37] tracking-wider flex items-center gap-1.5">
+                  <h3 className="text-xs font-black uppercase text-[#C89B3C] tracking-wider flex items-center gap-1.5">
                     <span>🥇</span> {t('gold_details')}
                   </h3>
                   <select 
                     value={detailedAssets.gold.unit} 
                     onChange={e => setDetailedAssets({ ...detailedAssets, gold: { ...detailedAssets.gold, unit: e.target.value as MetalUnit } })}
-                    className="bg-amber-50 text-[#D89F37] text-xs font-black px-2.5 py-1 rounded-lg outline-none border border-amber-200 cursor-pointer"
+                    className="bg-amber-50 text-[#C89B3C] text-xs font-bold px-2.5 py-1 rounded-lg outline-none border border-amber-200 cursor-pointer"
                   >
                     {(['gram', 'tola'] as MetalUnit[]).map(u => <option key={u} value={u}>{t(u)}</option>)}
                   </select>
@@ -455,7 +529,7 @@ const App: React.FC = () => {
                       placeholder="0"
                       value={detailedAssets.gold.weight || ''} 
                       onChange={e => setDetailedAssets({...detailedAssets, gold: {...detailedAssets.gold, weight: Math.max(0, Number(e.target.value))}})} 
-                      className="w-full bg-slate-50 p-2.5 text-lg font-black text-[#1E2E4F] rounded-lg border border-slate-200 focus:border-[#D89F37] outline-none" 
+                      className="w-full bg-slate-50/80 p-2 text-base font-black text-[#0B1D19] rounded-lg border border-slate-200 focus:border-[#C89B3C] outline-none" 
                     />
                   </div>
                   <div className="space-y-1">
@@ -466,18 +540,18 @@ const App: React.FC = () => {
                       placeholder="0"
                       value={detailedAssets.gold.ratePerUnit || ''} 
                       onChange={e => setDetailedAssets({...detailedAssets, gold: {...detailedAssets.gold, ratePerUnit: Math.max(0, Number(e.target.value))}})} 
-                      className="w-full bg-slate-50 p-2.5 text-lg font-black text-[#1E2E4F] rounded-lg border border-slate-200 focus:border-[#D89F37] outline-none" 
+                      className="w-full bg-slate-50/80 p-2 text-base font-black text-[#0B1D19] rounded-lg border border-slate-200 focus:border-[#C89B3C] outline-none" 
                     />
                   </div>
                 </div>
-                <div className="flex justify-between items-center pt-1 text-xs">
-                  <span className="text-slate-400 font-medium">{t('value')}:</span>
-                  <span className="font-black text-[#D89F37] bdi-num">₹{Math.round((detailedAssets.gold.weight || 0) * (detailedAssets.gold.ratePerUnit || 0)).toLocaleString()}</span>
+                <div className="flex justify-between items-center pt-1 text-xs text-slate-500 border-t border-slate-100">
+                  <span>{t('value')}:</span>
+                  <span className="font-black text-[#C89B3C] bdi-num">₹{Math.round((detailedAssets.gold.weight || 0) * (detailedAssets.gold.ratePerUnit || 0)).toLocaleString()}</span>
                 </div>
               </div>
 
               {/* Silver Section */}
-              <div className="glass-card p-5 space-y-3 bg-white/70 shadow-md border-l-4 rtl:border-l-0 rtl:border-r-4 border-slate-400">
+              <div className="silk-card p-4 sm:p-5 space-y-3 border-slate-300/40">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-black uppercase text-slate-600 tracking-wider flex items-center gap-1.5">
                     <span>🥈</span> {t('silver_details')}
@@ -485,7 +559,7 @@ const App: React.FC = () => {
                   <select 
                     value={detailedAssets.silver.unit} 
                     onChange={e => setDetailedAssets({ ...detailedAssets, silver: { ...detailedAssets.silver, unit: e.target.value as MetalUnit } })}
-                    className="bg-slate-100 text-slate-600 text-xs font-black px-2.5 py-1 rounded-lg outline-none border border-slate-200 cursor-pointer"
+                    className="bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-lg outline-none border border-slate-200 cursor-pointer"
                   >
                     {(['gram', 'tola'] as MetalUnit[]).map(u => <option key={u} value={u}>{t(u)}</option>)}
                   </select>
@@ -500,7 +574,7 @@ const App: React.FC = () => {
                       placeholder="0"
                       value={detailedAssets.silver.weight || ''} 
                       onChange={e => setDetailedAssets({...detailedAssets, silver: {...detailedAssets.silver, weight: Math.max(0, Number(e.target.value))}})} 
-                      className="w-full bg-slate-50 p-2.5 text-lg font-black text-[#1E2E4F] rounded-lg border border-slate-200 focus:border-slate-400 outline-none" 
+                      className="w-full bg-slate-50/80 p-2 text-base font-black text-[#0B1D19] rounded-lg border border-slate-200 focus:border-slate-400 outline-none" 
                     />
                   </div>
                   <div className="space-y-1">
@@ -511,19 +585,19 @@ const App: React.FC = () => {
                       placeholder="0"
                       value={detailedAssets.silver.ratePerUnit || ''} 
                       onChange={e => setDetailedAssets({...detailedAssets, silver: {...detailedAssets.silver, ratePerUnit: Math.max(0, Number(e.target.value))}})} 
-                      className="w-full bg-slate-50 p-2.5 text-lg font-black text-[#1E2E4F] rounded-lg border border-slate-200 focus:border-slate-400 outline-none" 
+                      className="w-full bg-slate-50/80 p-2 text-base font-black text-[#0B1D19] rounded-lg border border-slate-200 focus:border-slate-400 outline-none" 
                     />
                   </div>
                 </div>
-                <div className="flex justify-between items-center pt-1 text-xs">
-                  <span className="text-slate-400 font-medium">{t('value')}:</span>
+                <div className="flex justify-between items-center pt-1 text-xs text-slate-500 border-t border-slate-100">
+                  <span>{t('value')}:</span>
                   <span className="font-black text-slate-600 bdi-num">₹{Math.round((detailedAssets.silver.weight || 0) * (detailedAssets.silver.ratePerUnit || 0)).toLocaleString()}</span>
                 </div>
               </div>
 
               {/* Other Cash / Bank */}
-              <div className="glass-card p-5 space-y-2 bg-white/70 shadow-md border-l-4 rtl:border-l-0 rtl:border-r-4 border-blue-500">
-                <h3 className="text-xs font-black uppercase text-blue-600 tracking-wider flex items-center gap-1.5">
+              <div className="silk-card p-4 sm:p-5 space-y-2 border-teal-900/10">
+                <h3 className="text-xs font-black uppercase text-teal-700 tracking-wider flex items-center gap-1.5">
                   <span>💵</span> {t('other_cash')}
                 </h3>
                 <div className="relative flex items-center">
@@ -534,78 +608,79 @@ const App: React.FC = () => {
                     placeholder="0"
                     value={detailedAssets.otherCash || ''} 
                     onChange={e => setDetailedAssets({...detailedAssets, otherCash: Math.max(0, Number(e.target.value))})} 
-                    className={`w-full bg-slate-50 p-2.5 ${isRtl ? 'pr-7 text-right' : 'pl-7 text-left'} text-xl font-black text-[#1E2E4F] rounded-lg border border-slate-200 focus:border-blue-500 outline-none`} 
+                    className={`w-full bg-slate-50/80 p-2.5 ${isRtl ? 'pr-7 text-right' : 'pl-7 text-left'} text-xl font-black text-[#0B1D19] rounded-lg border border-slate-200 focus:border-teal-600 outline-none`} 
                   />
                 </div>
               </div>
 
               {/* Wasiyyah (Will) Section for Detailed Assets */}
-              <div className="pt-2">
-                <div className="glass-card p-5 space-y-3 bg-[#D89F37]/5 border border-[#D89F37]/30 shadow-md">
-                  <h3 className="text-xs font-black uppercase text-[#D89F37] tracking-wider flex items-center gap-1.5">
+              <div className="silk-card p-4 sm:p-5 space-y-3 bg-[#C89B3C]/5 border border-[#C89B3C]/30">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-black uppercase text-[#C89B3C] tracking-wider flex items-center gap-1.5">
                     <span>📜</span> {t('will_wasiyyah')}
                   </h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase block">{t('wasiyyah_cash')} (₹)</label>
-                      <input 
-                        type="number" 
-                        inputMode="numeric" 
-                        placeholder="0"
-                        value={detailedWill.cash || ''} 
-                        onChange={e => setDetailedWill({...detailedWill, cash: Math.max(0, Number(e.target.value))})} 
-                        className="w-full bg-white p-2 text-base font-black text-[#1E2E4F] rounded-lg border border-slate-200 outline-none focus:border-[#D89F37]" 
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase block">{t('wasiyyah_land')} ({t(detailedAssets.land.unit)})</label>
-                      <input 
-                        type="number" 
-                        inputMode="decimal" 
-                        step="any"
-                        placeholder="0"
-                        value={detailedWill.landArea || ''} 
-                        onChange={e => setDetailedWill({...detailedWill, landArea: Math.max(0, Number(e.target.value))})} 
-                        className="w-full bg-white p-2 text-base font-black text-[#1E2E4F] rounded-lg border border-slate-200 outline-none focus:border-[#D89F37]" 
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase block">{t('wasiyyah_gold')} ({t(detailedAssets.gold.unit)})</label>
-                      <input 
-                        type="number" 
-                        inputMode="decimal" 
-                        step="any"
-                        placeholder="0"
-                        value={detailedWill.goldWeight || ''} 
-                        onChange={e => setDetailedWill({...detailedWill, goldWeight: Math.max(0, Number(e.target.value))})} 
-                        className="w-full bg-white p-2 text-base font-black text-[#1E2E4F] rounded-lg border border-slate-200 outline-none focus:border-[#D89F37]" 
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase block">{t('wasiyyah_silver')} ({t(detailedAssets.silver.unit)})</label>
-                      <input 
-                        type="number" 
-                        inputMode="decimal" 
-                        step="any"
-                        placeholder="0"
-                        value={detailedWill.silverWeight || ''} 
-                        onChange={e => setDetailedWill({...detailedWill, silverWeight: Math.max(0, Number(e.target.value))})} 
-                        className="w-full bg-white p-2 text-base font-black text-[#1E2E4F] rounded-lg border border-slate-200 outline-none focus:border-[#D89F37]" 
-                      />
-                    </div>
+                  <span className="text-[10px] text-slate-400 font-medium">Max 1/3</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block">{t('wasiyyah_cash')} (₹)</label>
+                    <input 
+                      type="number" 
+                      inputMode="numeric" 
+                      placeholder="0"
+                      value={detailedWill.cash || ''} 
+                      onChange={e => setDetailedWill({...detailedWill, cash: Math.max(0, Number(e.target.value))})} 
+                      className="w-full bg-white p-2 text-sm font-black text-[#0B1D19] rounded-lg border border-slate-200 outline-none focus:border-[#C89B3C]" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block">{t('wasiyyah_land')} ({t(detailedAssets.land.unit)})</label>
+                    <input 
+                      type="number" 
+                      inputMode="decimal" 
+                      step="any"
+                      placeholder="0"
+                      value={detailedWill.landArea || ''} 
+                      onChange={e => setDetailedWill({...detailedWill, landArea: Math.max(0, Number(e.target.value))})} 
+                      className="w-full bg-white p-2 text-sm font-black text-[#0B1D19] rounded-lg border border-slate-200 outline-none focus:border-[#C89B3C]" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block">{t('wasiyyah_gold')} ({t(detailedAssets.gold.unit)})</label>
+                    <input 
+                      type="number" 
+                      inputMode="decimal" 
+                      step="any"
+                      placeholder="0"
+                      value={detailedWill.goldWeight || ''} 
+                      onChange={e => setDetailedWill({...detailedWill, goldWeight: Math.max(0, Number(e.target.value))})} 
+                      className="w-full bg-white p-2 text-sm font-black text-[#0B1D19] rounded-lg border border-slate-200 outline-none focus:border-[#C89B3C]" 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase block">{t('wasiyyah_silver')} ({t(detailedAssets.silver.unit)})</label>
+                    <input 
+                      type="number" 
+                      inputMode="decimal" 
+                      step="any"
+                      placeholder="0"
+                      value={detailedWill.silverWeight || ''} 
+                      onChange={e => setDetailedWill({...detailedWill, silverWeight: Math.max(0, Number(e.target.value))})} 
+                      className="w-full bg-white p-2 text-sm font-black text-[#0B1D19] rounded-lg border border-slate-200 outline-none focus:border-[#C89B3C]" 
+                    />
                   </div>
                 </div>
               </div>
             </>
           )}
 
-          {/* Liabilities Section: Debts & Funeral Expenses (and Simple Wasiyyah) */}
+          {/* Liabilities Section: Debts & Funeral Expenses */}
           {[
             { l: t('debts'), k: 'debts', i: '📉' },
             { l: t('funeral_expenses'), k: 'funeral', i: '🕯️' },
             ...(!detailedAssets.enabled ? [{ l: t('will_wasiyyah'), k: 'will', i: '📜' }] : [])
           ].map(f => (
-            <div key={f.k} className="glass-card p-5 space-y-2 shadow-md">
+            <div key={f.k} className="silk-card p-4 sm:p-5 space-y-2 border-slate-200">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block flex items-center gap-1.5">
                 <span>{f.i}</span> {f.l}
               </label>
@@ -617,7 +692,7 @@ const App: React.FC = () => {
                   placeholder="0"
                   value={(estate as any)[f.k] || ''} 
                   onChange={e => setEstate({...estate, [f.k]: Math.max(0, Number(e.target.value))})} 
-                  className={`w-full bg-transparent border-b-2 border-slate-200 py-3 ${isRtl ? 'pr-8 text-right' : 'pl-8 text-left'} text-2xl font-black text-[#1E2E4F] outline-none focus:border-[#006B46] transition-colors`} 
+                  className={`w-full bg-transparent border-b-2 border-slate-200 py-2.5 ${isRtl ? 'pr-8 text-right' : 'pl-8 text-left'} text-xl sm:text-2xl font-black text-[#0B1D19] outline-none focus:border-[#0A6A4C] transition-colors`} 
                 />
               </div>
             </div>
@@ -638,19 +713,19 @@ const App: React.FC = () => {
         setStep={setStep} 
         disabled={!deceasedGender}
       >
-        <div className="flex-1 flex flex-col items-center justify-center py-8 space-y-8 animate-in text-center">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-black text-[#1E2E4F]">{t('deceased_person')}</h2>
-            <p className="text-sm text-slate-500">{t('select_gender')}</p>
+        <div className="flex-1 flex flex-col items-center justify-center py-8 space-y-8 animate-elevate text-center">
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#0A6A4C]">{t('select_gender')}</span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1D19]">{t('deceased_person')}</h2>
           </div>
-          <div className="grid grid-cols-1 gap-5 w-full max-w-xs">
+          <div className="grid grid-cols-1 gap-4 w-full max-w-xs">
             {['Male', 'Female'].map(g => (
               <button 
                 key={g} 
                 onClick={() => setDeceasedGender(g as any)} 
-                className={`p-8 rounded-[32px] font-black text-2xl sm:text-3xl transition-all border-4 shadow-lg active-press flex items-center justify-center gap-3 ${deceasedGender === g ? 'bg-[#1E2E4F] text-white border-[#D89F37]' : 'bg-white text-slate-500 border-white hover:border-slate-200'}`}
+                className={`p-6 rounded-[28px] font-black text-xl sm:text-2xl transition-all border-2 active-press flex items-center justify-center gap-3.5 ${deceasedGender === g ? 'bg-gradient-to-r from-[#0A6A4C] to-[#08583E] text-white border-[#C89B3C] shadow-xl shadow-[#0A6A4C]/25' : 'bg-white text-slate-600 border-slate-200 hover:border-[#0A6A4C]/40 shadow-sm'}`}
               >
-                <span>{g === 'Male' ? '👨' : '👩'}</span>
+                <span className="text-3xl">{g === 'Male' ? '👨' : '👩'}</span>
                 <span>{g === 'Male' ? t('male') : t('female')}</span>
               </button>
             ))}
@@ -664,13 +739,13 @@ const App: React.FC = () => {
   if (step === AppStep.SELECTION) {
     return (
       <ScreenWrapper lang={lang} currentStep={step} setStep={setStep} hideFooter={true}>
-        <header className="shrink-0 pt-5 pb-3 text-center space-y-1">
-          <h2 className="text-2xl font-black text-[#1E2E4F]">{t('heirs')}</h2>
+        <header className="shrink-0 pt-4 pb-2 text-center space-y-0.5">
+          <h2 className="text-2xl font-extrabold text-[#0B1D19]">{t('heirs')}</h2>
           <p className="text-xs text-slate-500">{t('enter_count')}</p>
         </header>
 
-        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar space-y-3 mb-3">
-          <div className="glass-card overflow-hidden shadow-lg border border-slate-100">
+        <div className="flex-1 overflow-y-auto scroll-container hide-scrollbar space-y-2.5 mb-3">
+          <div className="silk-card overflow-hidden divide-y divide-slate-100">
             {HEIR_ORDER.map(type => {
               const meta = HEIR_METADATA[type];
               if ((type === 'Husband' && deceasedGender !== 'Female') || (type === 'Wives' && deceasedGender !== 'Male')) {
@@ -678,21 +753,21 @@ const App: React.FC = () => {
               }
               const count = getHeirCount(type as HeirType);
               return (
-                <div key={type} className="flex items-center justify-between border-b border-slate-100 last:border-0 p-4 transition-colors hover:bg-slate-50/50">
+                <div key={type} className="flex items-center justify-between p-3.5 transition-colors hover:bg-slate-50/50">
                   <div className="pr-2">
-                    <p className="font-bold text-[#1E2E4F] text-base leading-snug">{meta[lang]}</p>
-                    {meta.max && <span className="text-[10px] text-slate-400 font-medium">max: {meta.max}</span>}
+                    <p className="font-bold text-[#0B1D19] text-base leading-snug">{meta[lang]}</p>
+                    {meta.max && <span className="text-[10px] text-[#C89B3C] font-semibold">max: {meta.max}</span>}
                   </div>
-                  <div className="flex items-center gap-2.5 bg-slate-100/70 p-1.5 rounded-2xl shrink-0">
+                  <div className="flex items-center gap-2 bg-slate-100/70 p-1.5 rounded-xl shrink-0">
                     <button 
                       type="button"
                       aria-label="Decrease count"
                       onClick={() => updateHeirCount(type as HeirType, -1)} 
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${count > 0 ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-300'}`}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${count > 0 ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-300'}`}
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" /></svg>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" /></svg>
                     </button>
-                    <span className={`w-7 text-center font-black text-lg bdi-num ${count > 0 ? 'text-[#006B46]' : 'text-slate-300'}`}>
+                    <span className={`w-6 text-center font-black text-base bdi-num ${count > 0 ? 'text-[#0A6A4C]' : 'text-slate-300'}`}>
                       {count}
                     </span>
                     <button 
@@ -700,9 +775,9 @@ const App: React.FC = () => {
                       aria-label="Increase count"
                       disabled={meta.max ? count >= meta.max : false} 
                       onClick={() => updateHeirCount(type as HeirType, 1)} 
-                      className="w-9 h-9 rounded-xl bg-white text-[#006B46] shadow-sm flex items-center justify-center transition-all active-press disabled:opacity-30"
+                      className="w-8 h-8 rounded-lg bg-white text-[#0A6A4C] shadow-sm flex items-center justify-center transition-all active-press disabled:opacity-30"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
                     </button>
                   </div>
                 </div>
@@ -712,22 +787,25 @@ const App: React.FC = () => {
         </div>
 
         {uiError && (
-          <div className="mb-3 p-3.5 bg-rose-50 text-rose-700 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 border border-rose-200 animate-in">
-            <span className="shrink-0 text-base">⚠️</span> 
+          <div className="mb-3 p-3 bg-rose-50 text-rose-800 rounded-xl text-xs font-bold flex items-center gap-2 border border-rose-200 animate-elevate">
+            <span className="shrink-0 text-sm">⚠️</span> 
             <span>{uiError}</span>
           </div>
         )}
 
-        <div className="shrink-0 pb-6 flex flex-col gap-2.5">
+        <div className="shrink-0 pb-5 flex flex-col gap-2">
           <button 
             onClick={handleCalculate} 
-            className="w-full bg-[#006B46] text-white py-4 rounded-2xl font-black text-xl active-press shadow-2xl hover:bg-[#007a50] transition-colors"
+            className="w-full bg-gradient-to-r from-[#0A6A4C] to-[#08583E] text-white py-3.5 rounded-2xl font-extrabold text-lg active-press shadow-xl shadow-[#0A6A4C]/25 hover:shadow-2xl hover:shadow-[#0A6A4C]/35 border border-[#C89B3C]/30 transition-all flex items-center justify-center gap-2"
           >
-            {t('calculate')}
+            <span>{t('calculate')}</span>
+            <svg className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
           <button 
             onClick={() => setStep(AppStep.GENDER)} 
-            className="w-full h-12 rounded-2xl font-bold text-[#1E2E4F] bg-white/70 border border-slate-200 active-press hover:bg-white transition-colors"
+            className="w-full h-11 rounded-xl font-bold text-[#0B1D19] bg-white border border-slate-200 active-press hover:bg-slate-50 text-sm transition-colors"
           >
             {t('back')}
           </button>
@@ -740,35 +818,39 @@ const App: React.FC = () => {
   if (step === AppStep.RESULT && result) {
     return (
       <div className={`h-full flex flex-col overflow-hidden bg-transparent pt-safe ${langClass}`} dir={isRtl ? 'rtl' : 'ltr'}>
-        <header className="px-5 pt-4 pb-3 text-center space-y-3 shrink-0 relative">
-          <h2 className="text-2xl sm:text-3xl font-black text-[#1E2E4F] tracking-tight">{t('distribution_result')}</h2>
+        <header className="px-5 pt-3 pb-2 text-center space-y-2.5 shrink-0 relative">
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#0A6A4C]">{t('distribution_result')}</span>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[#0B1D19] tracking-tight">{t('app_title')}</h2>
+          </div>
           
-          {/* Main Grand Net Estate Banner */}
-          <div className="glass-navy p-5 text-white space-y-1 shadow-2xl text-center rounded-[24px]">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">{t('net_estate')}</p>
-            <p className="text-3xl sm:text-4xl font-black text-[#D89F37] tracking-tight bdi-num">
+          {/* Imperial Grand Net Estate Hero Card */}
+          <div className="royal-card p-4 sm:p-5 text-white space-y-1 text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#C89B3C]/10 rounded-full blur-2xl pointer-events-none" />
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C89B3C]">{t('net_estate')}</p>
+            <p className="text-3xl sm:text-4xl font-extrabold text-[#F4D37A] tracking-tight bdi-num drop-shadow-sm">
               ₹{Math.round(result.netEstate).toLocaleString()}
             </p>
           </div>
 
-          {/* Distributable Assets Breakdown Cards */}
+          {/* Distributable Assets 4-Quadrant Matrix */}
           {(detailedAssets.enabled || result.totalLand > 0 || result.totalGold > 0 || result.totalSilver > 0) && (
             <div className="grid grid-cols-2 gap-2 text-left rtl:text-right">
               {/* Cash Available */}
-              <div className="glass-card p-3 border-blue-100 shadow-sm flex flex-col justify-between">
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{t('cash_available')}</span>
-                <span className="text-base font-black text-blue-600 bdi-num">₹{Math.round(result.distributableCash).toLocaleString()}</span>
+              <div className="silk-card p-2.5 border-teal-900/15 flex flex-col justify-between">
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{t('cash_available')}</span>
+                <span className="text-sm sm:text-base font-extrabold text-teal-700 bdi-num">₹{Math.round(result.distributableCash).toLocaleString()}</span>
               </div>
 
               {/* Land Available */}
               {result.totalLand > 0 && (
-                <div className="glass-card p-3 border-emerald-100 shadow-sm flex flex-col justify-between">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{t('land_available')}</span>
+                <div className="silk-card p-2.5 border-emerald-900/15 flex flex-col justify-between">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{t('land_available')}</span>
                   <div>
-                    <span className="text-sm font-black text-[#006B46] bdi-num">
+                    <span className="text-sm font-extrabold text-[#0A6A4C] bdi-num">
                       {result.totalLand.toFixed(2)} {t(detailedAssets.land.unit)}
                     </span>
-                    <span className="block text-[10px] font-bold text-slate-400 bdi-num">
+                    <span className="block text-[9px] font-bold text-slate-400 bdi-num">
                       ≈ ₹{Math.round(result.totalLandValue).toLocaleString()}
                     </span>
                   </div>
@@ -777,13 +859,13 @@ const App: React.FC = () => {
 
               {/* Gold Available */}
               {result.totalGold > 0 && (
-                <div className="glass-card p-3 border-amber-100 shadow-sm flex flex-col justify-between">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{t('gold_available')}</span>
+                <div className="silk-card p-2.5 border-amber-900/15 flex flex-col justify-between">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{t('gold_available')}</span>
                   <div>
-                    <span className="text-sm font-black text-[#D89F37] bdi-num">
+                    <span className="text-sm font-extrabold text-[#C89B3C] bdi-num">
                       {result.totalGold.toFixed(3)} {t(detailedAssets.gold.unit)}
                     </span>
-                    <span className="block text-[10px] font-bold text-slate-400 bdi-num">
+                    <span className="block text-[9px] font-bold text-slate-400 bdi-num">
                       ≈ ₹{Math.round(result.totalGoldValue).toLocaleString()}
                     </span>
                   </div>
@@ -792,13 +874,13 @@ const App: React.FC = () => {
 
               {/* Silver Available */}
               {result.totalSilver > 0 && (
-                <div className="glass-card p-3 border-slate-200 shadow-sm flex flex-col justify-between">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{t('silver_available')}</span>
+                <div className="silk-card p-2.5 border-slate-300 flex flex-col justify-between">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{t('silver_available')}</span>
                   <div>
-                    <span className="text-sm font-black text-slate-600 bdi-num">
+                    <span className="text-sm font-extrabold text-slate-600 bdi-num">
                       {result.totalSilver.toFixed(3)} {t(detailedAssets.silver.unit)}
                     </span>
-                    <span className="block text-[10px] font-bold text-slate-400 bdi-num">
+                    <span className="block text-[9px] font-bold text-slate-400 bdi-num">
                       ≈ ₹{Math.round(result.totalSilverValue).toLocaleString()}
                     </span>
                   </div>
@@ -808,47 +890,47 @@ const App: React.FC = () => {
           )}
         </header>
 
-        {/* Scrollable Shares List */}
-        <div className="flex-1 min-h-0 overflow-y-auto scroll-container hide-scrollbar px-5 py-2 space-y-4">
-          {/* Summary Shares Percentages Banner */}
-          <div className="bg-emerald-50/70 border border-emerald-100 p-4 rounded-2xl shadow-sm backdrop-blur-md">
-            <div className="grid grid-cols-2 gap-3">
-              <div className={`space-y-0.5 ${isRtl ? 'border-l pl-2' : 'border-r pr-2'} border-emerald-100 text-center`}>
+        {/* Scrollable Individual Shares */}
+        <div className="flex-1 min-h-0 overflow-y-auto scroll-container hide-scrollbar px-5 py-2 space-y-3">
+          {/* Proportion Summary Dial */}
+          <div className="silk-card p-3.5 border-emerald-900/10">
+            <div className="grid grid-cols-2 gap-2 text-center">
+              <div className={`${isRtl ? 'border-l pl-2' : 'border-r pr-2'} border-slate-200`}>
                 <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">{t('fixed_shares')}</p>
-                <p className="text-lg font-black text-[#1E2E4F] bdi-num">{(result.summary.fixedTotal * 100).toFixed(1)}%</p>
+                <p className="text-base font-black text-[#0B1D19] bdi-num">{(result.summary.fixedTotal * 100).toFixed(1)}%</p>
               </div>
-              <div className="space-y-0.5 text-center">
+              <div>
                 <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">{t('residue_shares')}</p>
-                <p className="text-lg font-black text-[#1E2E4F] bdi-num">{(result.summary.residueTotal * 100).toFixed(1)}%</p>
+                <p className="text-base font-black text-[#0A6A4C] bdi-num">{(result.summary.residueTotal * 100).toFixed(1)}%</p>
               </div>
             </div>
           </div>
 
-          {/* Special Sharia Notices: Aul or Radd */}
+          {/* Sharia Rule Decrees: Aul or Radd */}
           {result.summary.aulApplied && (
-            <div className="p-3.5 rounded-2xl bg-amber-50 text-amber-900 text-xs font-bold border border-amber-200 flex items-center gap-2.5">
+            <div className="p-3 rounded-2xl bg-amber-50/90 text-amber-900 text-xs font-bold border border-amber-300/60 flex items-center gap-2">
               <span className="shrink-0 text-base">⚖️</span> 
               <span>{t('aul_warning')}</span>
             </div>
           )}
 
           {result.summary.raddApplied && (
-            <div className="p-3.5 rounded-2xl bg-teal-50 text-teal-900 text-xs font-bold border border-teal-200 flex items-center gap-2.5">
+            <div className="p-3 rounded-2xl bg-teal-50/90 text-teal-900 text-xs font-bold border border-teal-300/60 flex items-center gap-2">
               <span className="shrink-0 text-base">🔄</span> 
               <span>{t('radd_warning')}</span>
             </div>
           )}
 
           {result.warnings.map((w, i) => (
-            <div key={i} className="p-3.5 rounded-2xl bg-amber-50 text-amber-900 text-xs font-bold border border-amber-200 flex items-center gap-2.5">
+            <div key={i} className="p-3 rounded-2xl bg-amber-50/90 text-amber-900 text-xs font-bold border border-amber-300/60 flex items-center gap-2">
               <span className="shrink-0 text-base">⚠️</span> 
               <span>{t(w)}</span>
             </div>
           ))}
 
-          {/* Individual Shares List */}
+          {/* Heir Cards Feed */}
           <div className="space-y-3 pb-6">
-            <h3 className="px-1 font-black text-[#1E2E4F] text-[11px] uppercase tracking-wider opacity-60">
+            <h3 className="px-1 font-extrabold text-[#0B1D19] text-[11px] uppercase tracking-wider opacity-60">
               {t('individual_shares')}
             </h3>
 
@@ -857,37 +939,37 @@ const App: React.FC = () => {
               return (
                 <div 
                   key={i} 
-                  className={`glass-card p-5 flex flex-col gap-3 shadow-md border-l-4 rtl:border-l-0 rtl:border-r-4 transition-transform ${isExcluded ? 'border-slate-300 opacity-60' : 'border-[#006B46]'}`}
+                  className={`silk-card p-4 sm:p-5 flex flex-col gap-3 transition-transform ${isExcluded ? 'border-slate-200 bg-slate-50/50 opacity-60' : 'border-[#0A6A4C]/20'}`}
                 >
-                  {/* Card Header: Heir Name & Badges */}
+                  {/* Card Header */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-black text-[#1E2E4F] text-lg sm:text-xl leading-tight">{s.label}</p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
+                      <p className="font-extrabold text-[#0B1D19] text-lg leading-tight">{s.label}</p>
+                      <p className="text-[10px] font-bold text-[#0A6A4C] uppercase tracking-wider mt-0.5">
                         {isExcluded ? t('excluded') : `${s.type} • ${s.symbol}`}
                       </p>
                     </div>
-                    <div className="bg-white/80 px-3 py-1.5 rounded-xl text-xs font-black text-slate-600 border border-slate-200 shrink-0">
+                    <div className="bg-slate-100/80 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-700 border border-slate-200 shrink-0">
                       <span className="bdi-num">{s.count}</span> {s.count === 1 ? t('person') : t('persons')}
                     </div>
                   </div>
 
                   <div className="h-px bg-slate-100" />
 
-                  {/* Share Ratio and Total Monetary Share Value */}
-                  <div className="space-y-2">
+                  {/* Share Fraction & Primary Value Highlight */}
+                  <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('ratio')}</span>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-black text-[#1E2E4F] bg-slate-100 px-2 py-0.5 rounded-md bdi-num">{s.fraction}</span>
+                        <span className="text-xs font-black text-[#0B1D19] bg-slate-100 px-2 py-0.5 rounded-md bdi-num">{s.fraction}</span>
                         <span className="text-[10px] font-bold text-slate-400 bdi-num">({s.percentage})</span>
                       </div>
                     </div>
 
                     {!isExcluded && (
                       <div className="flex items-center justify-between pt-1">
-                        <span className="text-xs font-black text-slate-500 uppercase tracking-wider">{t('total_value_each')}</span>
-                        <span className="text-xl sm:text-2xl font-black text-[#006B46] tracking-tight bdi-num">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('total_value_each')}</span>
+                        <span className="text-xl font-extrabold text-[#0A6A4C] tracking-tight bdi-num">
                           ₹{Math.round(s.amountEach).toLocaleString()}
                         </span>
                       </div>
@@ -903,27 +985,25 @@ const App: React.FC = () => {
 
                   {/* Detailed Asset Breakdown per Individual */}
                   {!isExcluded && (
-                    <div className="pt-2 border-t border-slate-100 space-y-1.5 text-xs">
-                      {/* Cash Portion */}
+                    <div className="pt-2 border-t border-slate-100 space-y-1 text-xs">
                       {result.distributableCash > 0 && (
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-slate-500 flex items-center gap-1">
+                          <span className="font-semibold text-slate-500 flex items-center gap-1">
                             <span>💵</span> {t('cash_each')}
                           </span>
-                          <span className="font-black text-blue-600 bdi-num">
+                          <span className="font-bold text-teal-700 bdi-num">
                             ₹{Math.round(s.cashEach).toLocaleString()}
                           </span>
                         </div>
                       )}
 
-                      {/* Land Portion */}
                       {result.totalLand > 0 && s.landEach > 0 && (
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-slate-500 flex items-center gap-1">
+                          <span className="font-semibold text-slate-500 flex items-center gap-1">
                             <span>🏘️</span> {t('land_each')}
                           </span>
                           <div className="text-right rtl:text-left">
-                            <span className="font-black text-[#006B46] bdi-num">
+                            <span className="font-bold text-[#0A6A4C] bdi-num">
                               {s.landEach.toFixed(3)} {t(detailedAssets.land.unit)}
                             </span>
                             <span className="block text-[9px] text-slate-400 font-bold bdi-num">
@@ -933,14 +1013,13 @@ const App: React.FC = () => {
                         </div>
                       )}
 
-                      {/* Gold Portion */}
                       {result.totalGold > 0 && s.goldEach > 0 && (
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-slate-500 flex items-center gap-1">
+                          <span className="font-semibold text-slate-500 flex items-center gap-1">
                             <span>🥇</span> {t('gold_each')}
                           </span>
                           <div className="text-right rtl:text-left">
-                            <span className="font-black text-[#D89F37] bdi-num">
+                            <span className="font-bold text-[#C89B3C] bdi-num">
                               {s.goldEach.toFixed(3)} {t(detailedAssets.gold.unit)}
                             </span>
                             <span className="block text-[9px] text-slate-400 font-bold bdi-num">
@@ -950,14 +1029,13 @@ const App: React.FC = () => {
                         </div>
                       )}
 
-                      {/* Silver Portion */}
                       {result.totalSilver > 0 && s.silverEach > 0 && (
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-slate-500 flex items-center gap-1">
+                          <span className="font-semibold text-slate-500 flex items-center gap-1">
                             <span>🥈</span> {t('silver_each')}
                           </span>
                           <div className="text-right rtl:text-left">
-                            <span className="font-black text-slate-600 bdi-num">
+                            <span className="font-bold text-slate-600 bdi-num">
                               {s.silverEach.toFixed(3)} {t(detailedAssets.silver.unit)}
                             </span>
                             <span className="block text-[9px] text-slate-400 font-bold bdi-num">
@@ -974,13 +1052,16 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer Button: Start New Calculation */}
-        <div className="px-6 py-5 glass rounded-t-[32px] shadow-2xl shrink-0 pb-safe">
+        {/* Footer: Start New Calculation Button */}
+        <div className="px-6 py-4 glass-nav rounded-t-[32px] shadow-2xl shrink-0 pb-safe">
           <button 
             onClick={reset} 
-            className="w-full bg-[#1E2E4F] text-white py-4 rounded-2xl font-black text-lg active-press shadow-xl hover:bg-[#25375d] transition-colors"
+            className="w-full bg-[#0A1C18] hover:bg-[#142F29] text-white py-4 rounded-2xl font-bold text-base active-press shadow-xl border border-[#C89B3C]/30 transition-colors flex items-center justify-center gap-2"
           >
-            {t('new_calculation')}
+            <svg className="w-5 h-5 text-[#C89B3C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>{t('new_calculation')}</span>
           </button>
         </div>
       </div>

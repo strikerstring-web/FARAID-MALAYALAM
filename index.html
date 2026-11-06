@@ -8,14 +8,22 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- High-fidelity Arabic, Malayalam, Tamil and Latin Typography -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=Alexandria:wght@300;400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@300;400;500;600;700;800&family=Noto+Sans+Tamil:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Curated Royal Typography Stack: Outfit, Plus Jakarta Sans, Alexandria, IBM Plex Sans Arabic, Amiri, Scheherazade New -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Alexandria:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #006B46;
-      --secondary: #1E2E4F;
-      --accent: #D89F37;
-      --bg: #F0F4F0;
+      /* Royal Islamic Heritage Palette */
+      --primary: #0A6A4C;       /* Imperial Malachite */
+      --primary-hover: #08583E;
+      --secondary: #0A1C18;     /* Obsidian Jade */
+      --secondary-soft: #142F29;
+      --accent-gold: #C89B3C;   /* Burnished 24k Gold */
+      --gold-light: #F4D37A;
+      --gold-glow: rgba(200, 155, 60, 0.25);
+      --bg-canvas: #F6F8F5;     /* Warm Silk Alabaster */
+      --surface-white: #FFFFFF;
+      --text-main: #0B1D19;
+      --text-muted: #566E67;
     }
     
     html, body {
@@ -25,17 +33,17 @@
       width: 100%;
       overflow: hidden !important;
       position: fixed;
-      font-family: 'Plus Jakarta Sans', 'IBM Plex Sans Arabic', 'Noto Sans Malayalam', 'Noto Sans Tamil', sans-serif;
-      background-color: var(--bg);
-      color: #0f172a;
+      font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
       -webkit-tap-highlight-color: transparent;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      font-feature-settings: "kern" 1;
+      font-feature-settings: "kern" 1, "ss01" 1;
     }
 
-    /* Subtle Islamic Geometric Pattern */
+    /* Subtle Architectural Islamic Arabesque Lattice Background */
     body::before {
       content: "";
       position: absolute;
@@ -43,7 +51,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0l20 20-20 20-20-20zM0 40l20 20-20 20-20-20zM80 40l20 20-20 20-20-20zM40 80l20 20-20 20-20-20z' fill='%23006b46' fill-opacity='0.025' fill-rule='evenodd'/%3E%3C/svg%3E");
+      background-image: radial-gradient(circle at 50% 0%, rgba(10, 106, 76, 0.05) 0%, transparent 70%),
+                        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l15 15-15 15-15-15zM0 30l15 15-15 15-15-15zM60 30l15 15-15 15-15-15zM30 60l15 15-15 15-15-15z' fill='%230a6a4c' fill-opacity='0.022' fill-rule='evenodd'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
     }
@@ -56,9 +65,9 @@
       display: none !important;
     }
 
-    /* Professional Arabic UI Typography */
+    /* Modern Architectural Arabic Typography */
     .arabic {
-      font-family: 'IBM Plex Sans Arabic', 'Alexandria', sans-serif !important;
+      font-family: 'Alexandria', 'IBM Plex Sans Arabic', sans-serif !important;
       direction: rtl;
       text-align: right;
       letter-spacing: normal !important;
@@ -67,17 +76,17 @@
       font-feature-settings: "liga" 1, "calt" 1;
     }
 
-    /* Classical Arabic Display Text (Quranic Ayahs & Hadiths with Tashkeel) */
+    /* Classical Quranic & Hadith Display Text with Tashkeel */
     .arabic-display {
       font-family: 'Amiri', 'Scheherazade New', serif !important;
       direction: rtl !important;
       text-align: center !important;
-      font-size: clamp(1.25rem, 4.2vw, 1.75rem) !important;
-      line-height: 2.2 !important;
+      font-size: clamp(1.28rem, 4.2vw, 1.8rem) !important;
+      line-height: 2.3 !important;
       font-weight: 600 !important;
       color: var(--secondary);
       font-feature-settings: "liga" 1, "calt" 1, "mkmk" 1, "mark" 1;
-      padding: 0.25rem 0;
+      padding: 0.35rem 0;
       word-break: normal;
       overflow-wrap: break-word;
       text-rendering: optimizeLegibility;
@@ -96,39 +105,47 @@
       line-height: 1.6;
     }
 
-    /* Numerical and BiDi isolation to prevent inverted numbers, fractions, and currencies in RTL */
+    /* Numerical & BiDi Isolation */
     .bdi-num {
       direction: ltr !important;
       unicode-bidi: isolate !important;
       display: inline-block;
+      font-variant-numeric: tabular-nums;
     }
 
-    .glass {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border-top: 1px solid rgba(255, 255, 255, 0.5);
-    }
-
-    .glass-card {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.7);
+    /* Silk Frosted Glass Card */
+    .silk-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(10, 106, 76, 0.1);
+      box-shadow: 0 4px 20px -2px rgba(10, 30, 24, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
       border-radius: 24px;
     }
 
-    .glass-navy {
-      background: linear-gradient(135deg, rgba(30, 46, 79, 0.98), rgba(24, 37, 63, 0.95));
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+    /* Royal Obsidian Jade Card */
+    .royal-card {
+      background: linear-gradient(145deg, #0d2520 0%, #081714 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(200, 155, 60, 0.22);
+      box-shadow: 0 12px 36px -4px rgba(8, 23, 20, 0.25), 0 0 20px -2px rgba(200, 155, 60, 0.12);
       border-radius: 28px;
     }
 
+    /* Floating Navigation Frost */
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-top: 1px solid rgba(10, 106, 76, 0.1);
+      box-shadow: 0 -8px 30px rgba(8, 23, 20, 0.04);
+    }
+
+    /* Tactile Press Micro-interaction */
     .active-press:active {
-      transform: scale(0.97);
-      transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: scale(0.975);
+      transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .scroll-container {
@@ -137,12 +154,12 @@
       overscroll-behavior: contain;
     }
 
-    @keyframes fadeInScale {
-      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    @keyframes fadeInElevate {
+      from { opacity: 0; transform: translateY(8px) scale(0.99); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .animate-in {
-      animation: fadeInScale 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    .animate-elevate {
+      animation: fadeInElevate 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     /* Safe Area Padding Utilities */
@@ -150,7 +167,7 @@
     .pt-safe { padding-top: env(safe-area-inset-top); }
     
     input::placeholder {
-      color: rgba(30, 46, 79, 0.25);
+      color: rgba(11, 29, 25, 0.25);
     }
   </style>
 <script type="importmap">
@@ -164,7 +181,6 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body class="antialiased">
   <div id="root" class="h-full w-full relative z-10 overflow-hidden"></div>
